@@ -3,11 +3,23 @@
  *
  * See: https://www.gatsbyjs.com/docs/gatsby-config/
  */
-
+const path = require("path")
 module.exports = {
-  /* Your site config here */
+  proxy: {
+    prefix: "/api",
+    url: "http://localhost:5000",
+  },
   plugins: [
     `gatsby-plugin-material-ui`,
+    `gatsby-transformer-sharp`,
+    `gatsby-plugin-sharp`,
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        name: `images`,
+        path: path.join(__dirname, `src`, `images`),
+      },
+    },
     {
       resolve: `gatsby-plugin-react-redux`,
       options: {
