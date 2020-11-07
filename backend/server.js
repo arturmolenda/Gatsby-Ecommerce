@@ -6,6 +6,8 @@ dotenv.config();
 
 const app = express();
 
+app.use(express.json());
+
 if (process.env.NODE_ENV === 'development') {
   app.get('/', (req, res) => {
     res.send('API is running...');
@@ -16,8 +18,6 @@ if (process.env.NODE_ENV === 'development') {
 app.get('/api/products', (req, res) => {
   res.json(products);
 });
-
-app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 app.listen(
