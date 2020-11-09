@@ -4,17 +4,17 @@ const products = [
     images: [
       {
         image: 'macbook1.jpg',
-        credit:
+        description:
           "<a href='https://pixabay.com/users/qiye-116/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=190970'>育银 戚</a>",
       },
       {
         image: 'macbook2.jpg',
-        credit:
+        description:
           "<a href='https://pixabay.com/users/pexels-2286921/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=1282241'>Pexels</a>",
       },
       {
         image: 'macbook3.jpg',
-        credit:
+        description:
           "<a href='https://pixabay.com/photos/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=336651'>Free-Photos</a>",
       },
     ],
@@ -26,23 +26,24 @@ const products = [
     countInStock: 10,
     rating: 4.5,
     numReviews: 12,
+    show: true,
   },
   {
     name: 'Kraken Pro V2',
     images: [
       {
         image: 'razer1.jpg',
-        credit:
+        description:
           "<a href='https://pixabay.com/users/minimalist_-2133313/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=1377194'>minimalist_</a>",
       },
       {
         image: 'razer2.jpg',
-        credit:
+        description:
           "<a href='https://pixabay.com/users/minimalist_-2133313/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=1377193'>minimalist_</a>",
       },
       {
         image: 'razer3.jpg',
-        credit:
+        description:
           "<a href='https://pixabay.com/users/minimalist_-2133313/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=1377195'>minimalist_</a>",
       },
     ],
@@ -54,23 +55,24 @@ const products = [
     countInStock: 7,
     rating: 4.0,
     numReviews: 8,
+    show: true,
   },
   {
     name: 'A9 II Mirrorless Camera Body',
     images: [
       {
         image: 'sony1.jpg',
-        credit:
+        description:
           "<a href='https://pixabay.com/users/alexei_other-9114223/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=4833557'>Alexei Chizhov</a>",
       },
       {
         image: 'sony2.jpg',
-        credit:
+        description:
           "<a href='https://pixabay.com/users/alexei_other-9114223/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=4833561'>Alexei Chizhov</a>",
       },
       {
         image: 'sony3.jpg',
-        credit:
+        description:
           "<a href='https://pixabay.com/users/rkarkowski-289667/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=431119'>Robert Karkowski</a>",
       },
     ],
@@ -82,18 +84,19 @@ const products = [
     countInStock: 5,
     rating: 3,
     numReviews: 12,
+    show: true,
   },
   {
     name: 'Gameboy',
     images: [
       {
         image: 'gameboy1.jpg',
-        credit:
+        description:
           "<a href='https://pixabay.com/users/ptra-359668/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=3912103'>ptra</a>",
       },
       {
         image: 'gameboy2.jpg',
-        credit:
+        description:
           "<a href='https://pixabay.com/users/dimhou-5987327/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=3672462'>Dimitri Houtteman</a>",
       },
     ],
@@ -105,23 +108,24 @@ const products = [
     countInStock: 11,
     rating: 5,
     numReviews: 12,
+    show: true,
   },
   {
     name: 'iPhone 6 / 64GB',
     images: [
       {
         image: 'iphone1.jpg',
-        credit:
+        description:
           "<a href='https://pixabay.com/users/cmart29-3708955/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=1830479'>Chris Martin</a>",
       },
       {
         image: 'iphone2.jpg',
-        credit:
+        description:
           "<a href='https://pixabay.com/users/jessbaileydesign-7369896/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=3068617'>Jess Bailey</a>",
       },
       {
         image: 'iphone3.jpg',
-        credit:
+        description:
           "<a href='https://pixabay.com/users/toomacz-805248/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=856188'>Jan Tůma</a>",
       },
     ],
@@ -133,18 +137,19 @@ const products = [
     countInStock: 7,
     rating: 3.5,
     numReviews: 10,
+    show: true,
   },
   {
     name: 'iPad 6th Gen. 128GB',
     images: [
       {
         image: 'ipad1.jpg',
-        credit:
+        description:
           "<a href='https://pixabay.com/users/inproperstyle-617761/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=1291524'>C. Koch</a>",
       },
       {
         image: 'ipad2.jpg',
-        credit:
+        description:
           "<a href='https://pixabay.com/users/maxxgirr-3565425/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=4532326'>Maxx Girr</a>",
       },
     ],
@@ -156,6 +161,7 @@ const products = [
     countInStock: 0,
     rating: 4,
     numReviews: 12,
+    show: true,
   },
 ];
 
