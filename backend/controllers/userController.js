@@ -52,6 +52,14 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc    Get all users
+// @route   Get /api/users
+// @access  Private/Admin
+const getUsers = asyncHandler(async (req, res) => {
+  const users = await User.find();
+  res.json(users);
+});
+
 // @desc    Delete a user
 // @route   DELETE /api/users/:id
 // @access  Private/Admin
@@ -66,4 +74,4 @@ const deleteUser = asyncHandler(async (req, res) => {
   }
 });
 
-export { authUser, registerUser, deleteUser };
+export { authUser, registerUser, getUsers, deleteUser };
