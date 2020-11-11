@@ -14,6 +14,7 @@ const authUser = asyncHandler(async (req, res) => {
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
+      usedCoupons: user.usedCoupons,
       token: generateToken(user._id),
     });
   } else {
