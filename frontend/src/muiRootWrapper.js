@@ -1,5 +1,8 @@
 import React from "react"
 
+import { Provider } from "react-redux"
+import store from "./redux/store"
+
 import { CssBaseline } from "@material-ui/core"
 import { ThemeProvider } from "@material-ui/core/styles"
 import { createMuiTheme } from "@material-ui/core/styles"
@@ -25,9 +28,13 @@ const theme = createMuiTheme({
   },
 })
 
-export default ({ element }) => (
-  <ThemeProvider theme={theme}>
-    <CssBaseline />
-    <Layout>{element}</Layout>
-  </ThemeProvider>
-)
+export default ({ element }) => {
+  return (
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Layout>{element}</Layout>
+      </ThemeProvider>
+    </Provider>
+  )
+}
