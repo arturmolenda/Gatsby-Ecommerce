@@ -27,12 +27,9 @@ const Image = props => (
       const image = data.images.edges.find(n => {
         return n.node.relativePath.includes(props.filename)
       })
-      console.log(image)
       if (!image) {
         return null
       }
-      console.log(image.node)
-      //const imageSizes = image.node.childImageSharp.sizes; sizes={imageSizes}
       return <Img alt={props.alt} fluid={image.node.childImageSharp.fluid} />
     }}
   />
