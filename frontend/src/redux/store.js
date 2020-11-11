@@ -1,10 +1,35 @@
-import { createStore } from "redux"
+// import React from "react"
+// import { Provider } from "react-redux"
+import {
+  createStore as reduxCreateStore,
+  combineReducers,
+  applyMiddleware,
+} from "redux"
+import thunk from "redux-thunk"
+import { composeWithDevTools } from "redux-devtools-extension"
+import { userLoginReducer, userRegisterReducer } from "./reducers/userReducers"
+const reducer = combineReducers({
+  userLogin: userLoginReducer,
+  userRegister: userRegisterReducer,
+})
 
-function reducer() {
-  //...
+let userInfoFromStorage
+if (typeof window !== "undefined") {
+  userInfoFromStorage = localStorage.getItem("userInfo")
+    ? JSON.parse(localStorage.getItem("userInfo"))
+    : null
 }
 
-// preloadedState will be passed in by the plugin
-export default preloadedState => {
-  return createStore(reducer, preloadedState)
+const initialState = {
+  userLogin: { userInfo: userInfoFromStorage },
 }
+
+const middleware = [thunk]
+
+const createStore = reduxCreateStore(
+  reducer,
+  initialState,
+  composeWithDevTools(applyMiddleware(...middleware))
+)
+
+export default createStore

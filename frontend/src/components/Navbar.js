@@ -1,4 +1,8 @@
 import React from "react"
+
+import { useDispatch, useSelector } from "react-redux"
+import { logout } from "../redux/actions/userActions"
+
 import { makeStyles } from "@material-ui/core/styles"
 import { Link } from "gatsby"
 import AppBar from "@material-ui/core/AppBar"
@@ -22,6 +26,10 @@ const useStyles = makeStyles(theme => ({
 
 const Navbar = () => {
   const classes = useStyles()
+  const dispatch = useDispatch()
+  const { userInfo } = useSelector(state => state.userLogin)
+
+  const logoutHandle = () => dispatch(logout())
 
   return (
     <div className={classes.root}>
@@ -30,7 +38,15 @@ const Navbar = () => {
           <Typography variant="h6" className={classes.title}>
             <Link to="/">Gatsby Store</Link>
           </Typography>
-          <Button color="inherit">Login</Button>
+          {userInfo ? (
+            <Button color="inherit" onClick={logoutHandle}>
+              Logout
+            </Button>
+          ) : (
+            <Link to="/login">
+              <Button color="inherit">Login</Button>
+            </Link>
+          )}
         </Toolbar>
       </AppBar>
     </div>
