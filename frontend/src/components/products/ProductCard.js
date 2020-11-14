@@ -18,9 +18,6 @@ const useStyles = makeStyles(() => ({
     whiteSpace: "nowrap",
     overflowX: "hidden",
     textOverflow: "ellipsis",
-    "& h6": {
-      fontSize: "1.15rem",
-    },
   },
 }))
 const ProductCard = ({ product }) => {
@@ -30,13 +27,17 @@ const ProductCard = ({ product }) => {
       <Card className={classes.cardContainer}>
         <Link to={`/product/${product._id}`}>
           <div style={{ maxWidth: 300 }}>
-            <Image alt="xd" filename={product.images[0].image} />
+            <Image alt={product.name} filename={product.images[0].image} />
           </div>
           <CardContent className={classes.contentContainer}>
             <Typography className={classes.textEllipsis} variant="caption">
               {product.brand}
             </Typography>
-            <Typography className={classes.textEllipsis} variant="h6">
+            <Typography
+              className={classes.textEllipsis}
+              style={{ fontSize: "1.15rem" }}
+              variant="h6"
+            >
               {product.name}
             </Typography>
             <Typography variant="h6">${product.price}</Typography>
