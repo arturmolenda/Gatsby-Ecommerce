@@ -22,3 +22,7 @@ h1.MuiTypography-h1 {
   letter-spacing: 0.00735em;
   margin-bottom: 10px;
 }
+
+.MuiTypography-caption {
+  color: #66676e;
+}
