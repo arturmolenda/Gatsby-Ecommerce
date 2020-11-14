@@ -8,9 +8,11 @@ import {
 import thunk from "redux-thunk"
 import { composeWithDevTools } from "redux-devtools-extension"
 import { userLoginReducer, userRegisterReducer } from "./reducers/userReducers"
+import { productListReducer } from "./reducers/productReducers"
 const reducer = combineReducers({
   userLogin: userLoginReducer,
   userRegister: userRegisterReducer,
+  productList: productListReducer,
 })
 
 let userInfoFromStorage
