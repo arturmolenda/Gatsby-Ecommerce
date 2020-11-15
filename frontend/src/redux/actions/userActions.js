@@ -7,6 +7,7 @@ import {
   USER_REGISTER_REQUEST,
   USER_REGISTER_SUCCESS,
 } from "../constants/userConstants"
+import { CART_DELETE_ITEMS } from "../constants/cartConstants"
 import axios from "axios"
 
 export const login = (email, password) => async dispatch => {
@@ -38,6 +39,8 @@ export const login = (email, password) => async dispatch => {
 export const logout = () => async dispatch => {
   localStorage.removeItem("userInfo")
   dispatch({ type: USER_LOGOUT })
+  localStorage.removeItem("cartItems")
+  dispatch({ type: CART_DELETE_ITEMS })
 }
 
 export const register = (name, email, password) => async dispatch => {
