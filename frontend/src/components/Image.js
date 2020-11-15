@@ -30,7 +30,13 @@ const Image = props => (
       if (!image) {
         return null
       }
-      return <Img alt={props.alt} fluid={image.node.childImageSharp.fluid} />
+      return (
+        <Img
+          alt={props.alt}
+          fluid={image.node.childImageSharp.fluid}
+          style={props.customStyle}
+        />
+      )
     }}
   />
 )

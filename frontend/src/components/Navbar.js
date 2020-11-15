@@ -11,7 +11,8 @@ import Typography from "@material-ui/core/Typography"
 import Button from "@material-ui/core/Button"
 import IconButton from "@material-ui/core/IconButton"
 import MenuIcon from "@material-ui/icons/Menu"
-
+import ShoppingCartIcon from "@material-ui/icons/ShoppingCart"
+import { Badge } from "@material-ui/core"
 const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
@@ -22,12 +23,20 @@ const useStyles = makeStyles(theme => ({
   title: {
     flexGrow: 1,
   },
+  link: {
+    margin: "0 3px",
+    color: "#d0d0d0",
+    "&:hover": {
+      color: "#fff",
+    },
+  },
 }))
 
 const Navbar = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
   const { userInfo } = useSelector(state => state.userLogin)
+  const { cartItems } = useSelector(state => state.cart)
 
   const logoutHandle = () => dispatch(logout())
 
@@ -38,14 +47,36 @@ const Navbar = () => {
           <Typography variant="h6" className={classes.title}>
             <Link to="/">Gatsby Store</Link>
           </Typography>
+          <Link className={classes.link} to="/cart">
+            <Button
+              color="inherit"
+              startIcon={
+                <Badge
+                  color="secondary"
+                  variant="dot"
+                  badgeContent={cartItems.length}
+                >
+                  <ShoppingCartIcon style={{ width: ".8em", height: ".8em" }} />
+                </Badge>
+              }
+            >
+              CART
+            </Button>
+          </Link>
           {userInfo ? (
-            <Button color="inherit" onClick={logoutHandle}>
+            <Button
+              className={classes.link}
+              color="inherit"
+              onClick={logoutHandle}
+            >
               Logout
             </Button>
           ) : (
-            <Link to="/login">
-              <Button color="inherit">Login</Button>
-            </Link>
+            <>
+              <Link className={classes.link} to="/login">
+                <Button color="inherit">Login</Button>
+              </Link>
+            </>
           )}
         </Toolbar>
       </AppBar>

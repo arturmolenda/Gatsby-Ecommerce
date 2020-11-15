@@ -13,13 +13,14 @@ const useStyles = makeStyles(() => ({
   main: { marginTop: "4vh" },
 }))
 
-const Layout = ({ children }) => {
+const Layout = ({ children, location, path }) => {
   const classes = useStyles()
+  console.log(location, path)
   return (
     <div className={classes.flexWrapper}>
       <div>
         <Navbar />
-        <Container className={classes.main}>{children}</Container>
+        {children}
       </div>
       <Footer />
     </div>
