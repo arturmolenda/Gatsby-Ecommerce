@@ -1,5 +1,8 @@
 import React, { useState } from "react"
+
 import { useDispatch, useSelector } from "react-redux"
+import { addToCart } from "../../redux/actions/cartActions"
+
 import { Link } from "gatsby"
 import {
   Button,
@@ -9,6 +12,7 @@ import {
   InputLabel,
   makeStyles,
   Select,
+  Snackbar,
   Typography,
 } from "@material-ui/core"
 import { useEffect } from "react"
@@ -18,6 +22,8 @@ import Image from "../Image"
 import Loader from "../Loader"
 import Rating from "../Rating"
 import ArrowBackIcon from "@material-ui/icons/ArrowBack"
+import AddIcon from "@material-ui/icons/Add"
+import QtySelect from "../QtySelect"
 const useStyles = makeStyles(theme => ({
   imageMiniature: {
     cursor: "pointer",
@@ -45,22 +51,19 @@ const useStyles = makeStyles(theme => ({
       marginTop: "10px",
     },
   },
-  select: {
-    backgroundColor: "rgba(0,0,0,0.05)",
-  },
 }))
 
-const Product = ({ id }) => {
+const Product = ({ id, location }) => {
   const [product, setProduct] = useState()
   const [currentImage, setCurrentImage] = useState()
   const [quantity, setQuantity] = useState(1)
+  const [successAlert, setSuccessAlert] = useState(false)
   const classes = useStyles()
   const dispatch = useDispatch()
   const { loading, products, success, error } = useSelector(
     state => state.productList
   )
-  console.log(loading, products, error)
-
+  const backLink = location.search ? `/${location.search.split("=")[1]}` : "/"
   useEffect(() => {
     if (products.length !== 0) {
       const foundProduct = products.find(product => product._id === id)
@@ -78,9 +81,14 @@ const Product = ({ id }) => {
     setCurrentImage(imgObj)
   }
 
+  const addToCartHandle = () => {
+    dispatch(addToCart(product._id, quantity))
+    setSuccessAlert(true)
+  }
+  console.log(backLink)
   return (
     <>
-      <Link to="/">
+      <Link to={backLink} replace>
         <Button startIcon={<ArrowBackIcon />} style={{ marginBottom: 10 }}>
           Go back
         </Button>
@@ -162,35 +170,20 @@ const Product = ({ id }) => {
                   </div>
 
                   <div className={classes.actionsContainer}>
-                    {product.countInStock >= 1 ? (
-                      <FormControl variant="outlined" fullWidth>
-                        <InputLabel>Quantity</InputLabel>
-                        <Select
-                          className={classes.select}
-                          native
-                          label="Quantity"
-                          value={quantity}
-                          onChange={e => setQuantity(e.target.value)}
-                        >
-                          {product.countInStock >= 5
-                            ? [...Array(6).keys()].map(
-                                (val, i) =>
-                                  i !== 0 && <option value={val}>{val}</option>
-                              )
-                            : [...Array(product.countInStock).keys()].map(
-                                (val, i) =>
-                                  i !== 0 && <option value={val}>{val}</option>
-                              )}
-                        </Select>
-                      </FormControl>
-                    ) : (
-                      <Alert severity="warning">Out of stock</Alert>
-                    )}
+                    <QtySelect
+                      countInStock={product.countInStock}
+                      label="Quantity"
+                      value={quantity}
+                      changeHandle={e => setQuantity(e.target.value)}
+                      maxWidth
+                    />
                     <Button
                       color="primary"
                       variant="contained"
                       size="large"
+                      onClick={addToCartHandle}
                       fullWidth
+                      startIcon={<AddIcon />}
                       disabled={product.countInStock < 1}
                     >
                       Add to cart
@@ -203,6 +196,17 @@ const Product = ({ id }) => {
                 <Typography variant="body1">{product.description}</Typography>
               </div>
             </Grid>
+            <Snackbar
+              style={{ marginTop: 55 }}
+              open={successAlert}
+              autoHideDuration={1500}
+              onClose={() => setSuccessAlert(false)}
+              anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+              <Alert style={{ backgroundColor: "#dcf9dc" }} severity="success">
+                Item added to your cart!
+              </Alert>
+            </Snackbar>
           </>
         )
       )}
