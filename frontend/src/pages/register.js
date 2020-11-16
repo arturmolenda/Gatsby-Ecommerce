@@ -1,10 +1,10 @@
 import React from "react"
 import Register from "../components/screens/Register"
 import { Container } from "@material-ui/core"
-const register = () => {
+const register = ({ location }) => {
   return (
     <Container className={"main"}>
-      <Register />
+      <Register location={location} />
     </Container>
   )
 }
