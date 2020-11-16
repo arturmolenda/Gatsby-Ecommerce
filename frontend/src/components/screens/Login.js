@@ -18,8 +18,9 @@ import VisibilityIcon from "@material-ui/icons/Visibility"
 import VisibilityOffIcon from "@material-ui/icons/VisibilityOff"
 
 import Loader from "../Loader"
+import Steps from "../Steps"
 
-const Login = ({ history }) => {
+const Login = ({ location }) => {
   const [email, setEmail] = useState("")
   const [emailError, setEmailError] = useState("")
   const [password, setPassword] = useState("")
@@ -29,8 +30,11 @@ const Login = ({ history }) => {
   const dispatch = useDispatch()
   const { loading, error, userInfo } = useSelector(state => state.userLogin)
 
+  console.log(location)
+  const redirect = location.search ? `/${location.search.split("=")[1]}` : "/"
+
   useEffect(() => {
-    if (userInfo) navigate("/")
+    if (userInfo) navigate(redirect)
   }, [dispatch, userInfo])
 
   const validate = () => {
@@ -67,6 +71,7 @@ const Login = ({ history }) => {
   }
   return (
     <>
+      {redirect === "/shipping" && <Steps activeStep={0} />}
       <Grid container justify="center">
         <Grid item lg={4} md={6} sm={8} xs={8}>
           <form onSubmit={submitHandle} style={{ display: "grid" }}>
@@ -127,7 +132,9 @@ const Login = ({ history }) => {
       <Grid container justify="center">
         <Grid item lg={4} md={6} sm={8} xs={8}>
           <Typography variant="h1">NEW CUSTOMER?</Typography>
-          <Link to="/register">
+          <Link
+            to={redirect === "/" ? "/register" : `/register${location.search}`}
+          >
             <Button fullWidth variant="outlined">
               Register
             </Button>
