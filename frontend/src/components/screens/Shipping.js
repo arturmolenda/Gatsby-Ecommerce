@@ -7,12 +7,16 @@ import Steps from "../Steps"
 import { Button, Grid, TextField, Typography } from "@material-ui/core"
 import { saveShippingAddress } from "../../redux/actions/cartActions"
 
-const Shipping = () => {
+const Shipping = ({ location }) => {
   const [address, setAddress] = useState("")
   const [city, setCity] = useState("")
   const [postalCode, setPostalCode] = useState("")
   const [country, setCountry] = useState("")
   const [submitted, setSubmitted] = useState(false)
+
+  const nextPage = location.search
+    ? `/${location.search.split("=")[1]}`
+    : "/payment"
 
   const dispatch = useDispatch()
 
@@ -35,7 +39,7 @@ const Shipping = () => {
     setSubmitted(true)
     if (address.trim() && city.trim() && country.trim() && postalCode.trim()) {
       dispatch(saveShippingAddress({ address, city, postalCode, country }))
-      navigate("/payment")
+      navigate(nextPage)
     }
   }
 
@@ -46,7 +50,7 @@ const Shipping = () => {
           <Steps activeStep={1} />
           <Grid container justify="center">
             <Grid item lg={4} md={6} sm={8} xs={8}>
-              <Typography variant="h1">SIGN IN</Typography>
+              <Typography variant="h1">SHIPPING</Typography>
               <form onSubmit={submitHandle} style={{ display: "grid" }}>
                 <TextField
                   type="text"

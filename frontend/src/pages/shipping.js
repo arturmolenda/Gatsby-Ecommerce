@@ -2,10 +2,10 @@ import { Container } from "@material-ui/core"
 import React from "react"
 import Shipping from "../components/screens/Shipping"
 
-const shipping = () => {
+const shipping = ({ location }) => {
   return (
     <Container>
-      <Shipping />
+      <Shipping location={location} />
     </Container>
   )
 }
