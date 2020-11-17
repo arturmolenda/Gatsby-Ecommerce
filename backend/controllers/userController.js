@@ -72,22 +72,28 @@ const getUserProfile = asyncHandler(async (req, res) => {
 const updateUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
 
-  let emailExists, updatedUser;
-
+  let emailAccExists, updatedUser;
   if (await user.matchPassword(req.body.password)) {
-    if (req.body.email && req.body.email !== user.email) {
-      emailExists = await User.findOne({ email: req.body.email });
-      if (emailAccExists) {
-        res.status(400);
-        throw new Error('User with this email already exists');
-      }
-    }
-
     if (req.body.name) {
+      if (req.body.name === user.name && req.body.email === user.email) {
+        res.status(400);
+        throw new Error('Nothing to update');
+      }
+      if (req.body.email && req.body.email !== user.email) {
+        emailAccExists = await User.findOne({ email: req.body.email });
+        if (emailAccExists) {
+          res.status(400);
+          throw new Error('User with this email already exists');
+        }
+      }
       user.name = req.body.name || user.name;
       user.email = req.body.email || user.email;
       updatedUser = await user.save();
-    } else if (req.body.newPassword) {
+    } else {
+      if (await user.matchPassword(req.body.newPassword)) {
+        res.status(400);
+        throw new Error('Passwords are the same');
+      }
       user.password = req.body.newPassword;
       updatedUser = await user.save();
     }
@@ -96,6 +102,8 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       name: updatedUser.name,
       email: updatedUser.email,
       isAdmin: updatedUser.isAdmin,
+      usedCoupons: updatedUser.usedCoupons,
+      token: generateToken(updatedUser._id),
     });
   } else {
     res.status(401);

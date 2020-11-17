@@ -14,7 +14,7 @@ router.route('/').post(registerUser).get(protect, admin, getUsers);
 router.post('/login', authUser);
 router.route('/:id').delete(protect, admin, deleteUser);
 router
-  .route('/api/users/profile')
+  .route('/profile')
   .get(protect, getUserProfile)
   .put(protect, updateUserProfile);
 
