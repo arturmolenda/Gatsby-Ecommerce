@@ -12,7 +12,7 @@ import Layout from "./components/Layout"
 const theme = createMuiTheme({
   palette: {
     primary: {
-      main: "#323232",
+      main: "#343a40",
       light: "#484848",
       dark: "#191919",
     },
