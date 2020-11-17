@@ -2,10 +2,10 @@ import React from "react"
 import Login from "../components/screens/Login"
 import { Container } from "@material-ui/core"
 
-const login = () => {
+const login = ({ location }) => {
   return (
     <Container className={"main"}>
-      <Login />
+      <Login location={location} />
     </Container>
   )
 }

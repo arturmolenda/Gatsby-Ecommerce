@@ -17,8 +17,9 @@ import VisibilityIcon from "@material-ui/icons/Visibility"
 import VisibilityOffIcon from "@material-ui/icons/VisibilityOff"
 
 import Loader from "../Loader"
+import Steps from "../Steps"
 
-const Login = () => {
+const Login = ({ location }) => {
   const [name, setName] = useState("")
   const [nameError, setNameError] = useState("")
   const [email, setEmail] = useState("")
@@ -34,8 +35,10 @@ const Login = () => {
   const { loading, error, userInfo } = useSelector(state => state.userRegister)
   const { userInfo: userLoggedIn } = useSelector(state => state.userLogin)
 
+  const redirect = location.search ? `/${location.search.split("=")[1]}` : "/"
+
   useEffect(() => {
-    if (userInfo || userLoggedIn) navigate("/")
+    if (userInfo || userLoggedIn) navigate(redirect)
   }, [dispatch, userInfo])
 
   const validate = () => {
@@ -94,8 +97,10 @@ const Login = () => {
     } else setConfirmPasswordError("")
     setConfirmPassword(e.target.value)
   }
+  console.log(redirect, redirect === "/shipping")
   return (
     <>
+      {redirect === "/shipping" && <Steps activeStep={0} />}
       <Grid container justify="center">
         <Grid item lg={4} md={6} sm={8} xs={8}>
           <form onSubmit={submitHandle} style={{ display: "grid" }}>
@@ -103,7 +108,7 @@ const Login = () => {
             {error && <Alert severity="error">{error}</Alert>}
             <TextField
               type="text"
-              label="Name *"
+              label="Name*"
               variant="filled"
               margin="dense"
               error={Boolean(nameError)}
@@ -113,7 +118,7 @@ const Login = () => {
             />
             <TextField
               type="email"
-              label="Email *"
+              label="Email*"
               variant="filled"
               margin="dense"
               error={Boolean(emailError)}
@@ -123,7 +128,7 @@ const Login = () => {
             />
             <TextField
               type={showPassword ? "text" : "password"}
-              label="Password *"
+              label="Password*"
               variant="filled"
               margin="dense"
               error={Boolean(passwordError)}
@@ -150,7 +155,7 @@ const Login = () => {
             />
             <TextField
               type={showConfirmPassword ? "text" : "password"}
-              label="Confirm Password *"
+              label="Confirm Password*"
               variant="filled"
               margin="dense"
               error={Boolean(confirmPasswordError)}
@@ -195,7 +200,7 @@ const Login = () => {
       <Grid container justify="center">
         <Grid item lg={4} md={6} sm={8} xs={8}>
           <Typography variant="h1">HAVE AN ACCOUNT?</Typography>
-          <Link to="/login">
+          <Link to={redirect === "/" ? "/login" : `/login${location.search}`}>
             <Button fullWidth variant="outlined">
               LOGIN
             </Button>
