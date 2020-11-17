@@ -53,6 +53,64 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc    Get user profile
+// @route   GET /api/users/profile
+// @access  Private
+const getUserProfile = asyncHandler(async (req, res) => {
+  const { user } = req;
+  res.json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    isAdmin: user.isAdmin,
+  });
+});
+
+// @desc    Update user profile
+// @route   PUT /api/users/profile
+// @access  Private
+const updateUserProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  let emailAccExists, updatedUser;
+  if (await user.matchPassword(req.body.password)) {
+    if (req.body.name) {
+      if (req.body.name === user.name && req.body.email === user.email) {
+        res.status(400);
+        throw new Error('Nothing to update');
+      }
+      if (req.body.email && req.body.email !== user.email) {
+        emailAccExists = await User.findOne({ email: req.body.email });
+        if (emailAccExists) {
+          res.status(400);
+          throw new Error('User with this email already exists');
+        }
+      }
+      user.name = req.body.name || user.name;
+      user.email = req.body.email || user.email;
+      updatedUser = await user.save();
+    } else {
+      if (await user.matchPassword(req.body.newPassword)) {
+        res.status(400);
+        throw new Error('Passwords are the same');
+      }
+      user.password = req.body.newPassword;
+      updatedUser = await user.save();
+    }
+    res.json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      isAdmin: updatedUser.isAdmin,
+      usedCoupons: updatedUser.usedCoupons,
+      token: generateToken(updatedUser._id),
+    });
+  } else {
+    res.status(401);
+    throw new Error('Invalid password');
+  }
+});
+
 // @desc    Get all users
 // @route   Get /api/users
 // @access  Private/Admin
@@ -75,4 +133,11 @@ const deleteUser = asyncHandler(async (req, res) => {
   }
 });
 
-export { authUser, registerUser, getUsers, deleteUser };
+export {
+  authUser,
+  registerUser,
+  updateUserProfile,
+  getUserProfile,
+  getUsers,
+  deleteUser,
+};
