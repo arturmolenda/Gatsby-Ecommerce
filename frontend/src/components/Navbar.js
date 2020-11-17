@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 
 import { useDispatch, useSelector } from "react-redux"
 import { logout } from "../redux/actions/userActions"
@@ -12,7 +12,7 @@ import Button from "@material-ui/core/Button"
 import IconButton from "@material-ui/core/IconButton"
 import MenuIcon from "@material-ui/icons/Menu"
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart"
-import { Badge } from "@material-ui/core"
+import { Badge, Menu, MenuItem } from "@material-ui/core"
 const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
@@ -33,6 +33,7 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const Navbar = () => {
+  const [anchorEl, setAnchorEl] = useState(null)
   const classes = useStyles()
   const dispatch = useDispatch()
   const { userInfo } = useSelector(state => state.userLogin)
@@ -64,13 +65,36 @@ const Navbar = () => {
             </Button>
           </Link>
           {userInfo ? (
-            <Button
-              className={classes.link}
-              color="inherit"
-              onClick={logoutHandle}
-            >
-              Logout
-            </Button>
+            <>
+              <Button
+                className={classes.link}
+                color="inherit"
+                onClick={e => setAnchorEl(e.currentTarget)}
+              >
+                {userInfo.name}
+              </Button>
+              <Menu
+                onClose={() => setAnchorEl(null)}
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                getContentAnchorEl={null}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "left",
+                }}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "left",
+                }}
+              >
+                <div style={{ minWidth: 150 }}>
+                  <Link to="/profile">
+                    <MenuItem>Profile</MenuItem>
+                  </Link>
+                  <MenuItem onClick={logoutHandle}>Logout</MenuItem>
+                </div>
+              </Menu>
+            </>
           ) : (
             <>
               <Link className={classes.link} to="/login">
