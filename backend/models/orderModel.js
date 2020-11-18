@@ -41,7 +41,7 @@ const orderSchema = mongoose.Schema(
     paidAt: { type: Date },
     deliverySent: { type: Boolean, required: true, default: false },
     deliveredSentAt: { type: Date },
-    tacking: { type: String },
+    tracking: { type: String },
   },
   {
     timestamps: true,
