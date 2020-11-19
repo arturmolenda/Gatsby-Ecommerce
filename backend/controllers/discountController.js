@@ -33,9 +33,8 @@ const validateDiscount = asyncHandler(async (req, res) => {
         res.json({
           newPrice,
           code: coupon,
-          discount: discount.isPercent
-            ? `${discount.amount}%`
-            : `$${discount.amount}`,
+          amount: discount.amount,
+          isPercent: discount.isPercent,
         });
       } else {
         res.status(400);
