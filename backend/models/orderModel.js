@@ -39,9 +39,9 @@ const orderSchema = mongoose.Schema(
     totalPrice: { type: Number, required: true, default: 0.0 }, // price after applying coupon discount
     isPaid: { type: Boolean, required: true, default: false },
     paidAt: { type: Date },
-    deliverySent: { type: Boolean, required: true, default: false },
-    deliveredSentAt: { type: Date },
-    tacking: { type: String },
+    shipped: { type: Boolean, required: true, default: false },
+    shippedAt: { type: Date },
+    tracking: { type: String },
   },
   {
     timestamps: true,

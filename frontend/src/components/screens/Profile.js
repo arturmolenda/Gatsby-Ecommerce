@@ -8,6 +8,7 @@ import {
   Button,
   Grid,
   makeStyles,
+  Paper,
   Table,
   TableBody,
   TableCell,
@@ -21,6 +22,8 @@ import ShoppingBasketIcon from "@material-ui/icons/ShoppingBasket"
 
 import UpdateUser from "../UpdateUser"
 import { Alert } from "@material-ui/lab"
+import { listMyOrders } from "../../redux/actions/orderActions"
+import Loader from "../Loader"
 
 const useStyles = makeStyles(() => ({
   header: {
@@ -43,51 +46,24 @@ const useStyles = makeStyles(() => ({
   },
 }))
 
-const DUMMY_ORDERS = [
-  {
-    _id: "5f9e66b255397f21445a7255",
-    createdAt: "2020-11-01T07:41:38.858+00:00",
-    totalPrice: 1859.98,
-    isPaid: true,
-    paidAt: "2020-11-11T08:04:54.677+00:00",
-    deliverySent: true,
-    deliverySentAt: "2020-11-02T09:09:02.661+00:00",
-  },
-  {
-    _id: "5f9e66b255397f21445a7255",
-    createdAt: "2020-11-20T08:04:54.677+00:00",
-    totalPrice: 1859.98,
-    isPaid: true,
-    paidAt: "2020-11-05T08:04:54.677+00:00",
-    deliverySent: false,
-    deliverySentAt: null,
-  },
-  {
-    _id: "5f9e66b255397f21445a7255",
-    createdAt: "2020-11-01T09:09:02.661+00:00",
-    totalPrice: 100.1,
-    isPaid: false,
-    paidAt: null,
-    deliverySent: false,
-    deliverySentAt: null,
-  },
-]
-
 const Profile = () => {
   const dispatch = useDispatch()
   const { userInfo } = useSelector(state => state.userLogin)
+  const { loading, orders, error } = useSelector(state => state.orderListMy)
   const classes = useStyles()
 
   useEffect(() => {
     if (!userInfo) navigate("/login")
+    if (!orders) dispatch(listMyOrders())
     return () => {
       dispatch({ type: USER_UPDATE_RESET })
     }
-  }, [userInfo])
+  }, [userInfo, orders])
 
   return (
     <>
-      {userInfo && (
+      {loading && <Loader />}
+      {userInfo && !loading && (
         <Grid container spacing={2}>
           <Grid item md={3} sm={12} xs={12}>
             <Typography variant="h2" className={classes.header}>
@@ -99,8 +75,9 @@ const Profile = () => {
             <Typography variant="h2" className={classes.header}>
               MY ORDERS
             </Typography>
-            {DUMMY_ORDERS.length > 0 ? (
-              <TableContainer>
+            {error && <Alert severity="error">{error}</Alert>}
+            {orders && orders.length > 0 ? (
+              <TableContainer component={Paper}>
                 <Table>
                   <TableHead>
                     <TableRow>
@@ -108,12 +85,12 @@ const Profile = () => {
                       <TableCell>DATE</TableCell>
                       <TableCell>TOTAL</TableCell>
                       <TableCell>PAID</TableCell>
-                      <TableCell>DELIVERED</TableCell>
+                      <TableCell>SHIPPED</TableCell>
                       <TableCell></TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {DUMMY_ORDERS.map(item => (
+                    {orders.map(item => (
                       <TableRow
                         key={item._id}
                         className={classes.tableBackground}
@@ -129,8 +106,8 @@ const Profile = () => {
                           )}
                         </TableCell>
                         <TableCell>
-                          {item.deliverySent ? (
-                            item.deliverySentAt.substring(0, 10)
+                          {item.shipped ? (
+                            item.shippedAt.substring(0, 10)
                           ) : (
                             <ClearIcon color="secondary" />
                           )}

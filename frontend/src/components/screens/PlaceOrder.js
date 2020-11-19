@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import { navigate, Link } from "gatsby"
 
 import { useDispatch, useSelector } from "react-redux"
+import { applyDiscount } from "../../redux/actions/discountActions"
 
 import {
   Card,
@@ -21,6 +22,9 @@ import Steps from "../Steps"
 import Image from "../Image"
 import EditIcon from "@material-ui/icons/Edit"
 import PaymentCard from "../PaymentCard"
+import { useEffect } from "react"
+import { createOrder } from "../../redux/actions/orderActions"
+import { Alert } from "@material-ui/lab"
 
 const useStyles = makeStyles(theme => ({
   divideContainers: {
@@ -49,27 +53,75 @@ const useStyles = makeStyles(theme => ({
 
 const PlaceOrder = () => {
   const [coupon, setCoupon] = useState("")
+  const [price, setPrice] = useState(0)
+  const [totalPrice, setTotalPrice] = useState(0)
   const classes = useStyles()
   const dispatch = useDispatch()
+
+  const { userInfo } = useSelector(state => state.userLogin)
+  const { loading, order, success, error } = useSelector(
+    state => state.orderCreate
+  )
   const {
     cartItems,
     shippingAddress: { address, city, postalCode, country },
     paymentMethod,
   } = useSelector(state => state.cart)
+  let discount = useSelector(state => state.discountApply)
 
-  const loading = false
-  const couponError = false
+  // calculations and redirect
+  useEffect(() => {
+    if (!userInfo) navigate("/login")
+    if (cartItems.length === 0) navigate("/cart")
+    else {
+      const itemsPrice = cartItems
+        .reduce((a, i) => a + i.price * i.qty, 0)
+        .toFixed(2)
+      setPrice(itemsPrice)
+      setTotalPrice(itemsPrice < 100 ? parseFloat(itemsPrice) + 10 : itemsPrice)
+    }
+  }, [userInfo, cartItems])
 
-  // calculations
-  const price = cartItems.reduce((a, i) => a + i.price * i.qty, 0).toFixed(2)
-  const totalPrice = price < 100 ? parseFloat(price) + 10 : price
+  useEffect(() => {
+    if (success) {
+      navigate(`/order/${order._id}`)
+    }
+  }, [success, order])
 
   const applyCouponHandle = () => {
-    console.log("coupon", coupon)
+    dispatch(applyDiscount(coupon, totalPrice))
   }
 
   const placeOrderHandle = () => {
-    console.log("place")
+    if (cartItems.length !== 0 && userInfo) {
+      dispatch(
+        createOrder({
+          orderItems: cartItems,
+          shippingAddress: {
+            address,
+            city,
+            postalCode,
+            country,
+          },
+          paymentMethod,
+          price,
+          totalPrice,
+          shippingPrice: price < 100 ? 10 : 0,
+          coupon: discount.couponInfo
+            ? {
+                code: discount.couponInfo.code,
+                isPercent: discount.couponInfo.isPercent,
+                amount: discount.couponInfo.amount,
+              }
+            : null,
+        })
+      )
+    }
+  }
+
+  const couponChange = e => {
+    setCoupon(e.target.value)
+    discount.error = null
   }
 
   return (
@@ -79,6 +131,7 @@ const PlaceOrder = () => {
       </Container>
       <Container className={classes.orderContainer}>
         <Typography variant="h1">PLACE ORDER</Typography>
+        {error && <Alert severity="error">{error}</Alert>}
         <Grid container spacing={2} style={{ marginTop: 30 }}>
           <Grid item md={8} sm={12} xs={12}>
             <Card style={{ padding: "20px 10px" }}>
@@ -157,14 +210,16 @@ const PlaceOrder = () => {
               title={"ORDER SUMMARY"}
               price={price}
               totalPrice={totalPrice}
-              loading={loading}
               btnText={"PLACE ORDER"}
               btnHandle={placeOrderHandle}
+              loading={loading}
               showCoupon
               coupon={coupon}
-              setCoupon={setCoupon}
+              setCoupon={couponChange}
               applyCouponHandle={applyCouponHandle}
-              error={couponError}
+              couponError={discount.error}
+              couponLoading={discount.loading}
+              couponInfo={discount.couponInfo}
             />
           </Grid>
         </Grid>

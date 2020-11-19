@@ -17,6 +17,7 @@ import {
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore"
 import ExpandLessIcon from "@material-ui/icons/ExpandLess"
 import { Alert } from "@material-ui/lab"
+import Loader from "./Loader"
 
 const useStyles = makeStyles(theme => ({
   checkoutTitle: {
@@ -62,9 +63,11 @@ const PaymentCard = ({
   btnHandle,
   showCoupon,
   coupon,
+  couponLoading,
+  couponError,
   setCoupon,
   applyCouponHandle,
-  error,
+  couponInfo,
 }) => {
   const [expanded, setExpanded] = useState(false)
   const classes = useStyles()
@@ -90,12 +93,22 @@ const PaymentCard = ({
                 {price >= 100 ? "Free" : "$10"}
               </TableCell>
             </TableRow>
+            {couponInfo && (
+              <TableRow>
+                <TableCell>Coupon Applied: "{couponInfo.code}"</TableCell>
+                <TableCell align="right">
+                  {couponInfo.isPercent
+                    ? `${couponInfo.amount}%`
+                    : `$${couponInfo.amount}`}
+                </TableCell>
+              </TableRow>
+            )}
             <TableRow>
               <TableCell style={{ fontWeight: 600 }}>
                 Total Price (tax included)
               </TableCell>
               <TableCell style={{ fontWeight: 600 }} align="right">
-                ${totalPrice}
+                ${couponInfo ? couponInfo.newPrice : totalPrice}
               </TableCell>
             </TableRow>
           </TableBody>
@@ -107,9 +120,10 @@ const PaymentCard = ({
             color="primary"
             size="large"
             onClick={btnHandle}
-            disabled={loading}
+            disabled={loading || couponLoading}
           >
             {btnText}
+            {loading && <Loader button />}
           </Button>
         </div>
       </TableContainer>
@@ -136,20 +150,27 @@ const PaymentCard = ({
               variant="outlined"
               margin="dense"
               value={coupon}
-              onChange={e => setCoupon(e.target.value)}
+              onChange={setCoupon}
               style={{ marginBottom: 10 }}
             />
-            {coupon.length !== 0 && !error && (
-              <Button
-                fullWidth
-                variant="contained"
-                color="primary"
-                onClick={applyCouponHandle}
-              >
-                Apply
-              </Button>
+            {coupon.length !== 0 &&
+              !couponError &&
+              (couponInfo ? couponInfo.code !== coupon : true) && (
+                <Button
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  onClick={applyCouponHandle}
+                  disabled={couponLoading || loading}
+                >
+                  Apply
+                  {couponLoading && <Loader button />}
+                </Button>
+              )}
+            {couponError && <Alert severity="error">{couponError}</Alert>}
+            {couponInfo && couponInfo.code === coupon && (
+              <Alert severity="success">Discount Applied!</Alert>
             )}
-            {error && <Alert variant="error">{error}</Alert>}
           </Collapse>
         </Card>
       )}

@@ -11,6 +11,7 @@ import {
   USER_UPDATE_SUCCESS,
 } from "../constants/userConstants"
 import { CART_DELETE_ITEMS } from "../constants/cartConstants"
+import { ORDER_LIST_MY_RESET } from "../constants/orderConstants"
 import axios from "axios"
 
 export const login = (email, password) => async dispatch => {
@@ -41,9 +42,10 @@ export const login = (email, password) => async dispatch => {
 
 export const logout = () => async dispatch => {
   localStorage.removeItem("userInfo")
-  dispatch({ type: USER_LOGOUT })
   localStorage.removeItem("cartItems")
+  dispatch({ type: USER_LOGOUT })
   dispatch({ type: CART_DELETE_ITEMS })
+  dispatch({ type: ORDER_LIST_MY_RESET })
 }
 
 export const register = (name, email, password) => async dispatch => {
