@@ -23,6 +23,8 @@ import Image from "../Image"
 import EditIcon from "@material-ui/icons/Edit"
 import PaymentCard from "../PaymentCard"
 import { useEffect } from "react"
+import { createOrder } from "../../redux/actions/orderActions"
+import { Alert } from "@material-ui/lab"
 
 const useStyles = makeStyles(theme => ({
   divideContainers: {
@@ -57,6 +59,9 @@ const PlaceOrder = () => {
   const dispatch = useDispatch()
 
   const { userInfo } = useSelector(state => state.userLogin)
+  const { loading, order, success, error } = useSelector(
+    state => state.orderCreate
+  )
   const {
     cartItems,
     shippingAddress: { address, city, postalCode, country },
@@ -64,25 +69,55 @@ const PlaceOrder = () => {
   } = useSelector(state => state.cart)
   let discount = useSelector(state => state.discountApply)
 
-  // calculations
-  useEffect(() => {
-    const itemsPrice = cartItems
-      .reduce((a, i) => a + i.price * i.qty, 0)
-      .toFixed(2)
-    setPrice(itemsPrice)
-    setTotalPrice(itemsPrice < 100 ? parseFloat(itemsPrice) + 10 : itemsPrice)
-  }, [cartItems])
-
+  // calculations and redirect
   useEffect(() => {
     if (!userInfo) navigate("/login")
     if (cartItems.length === 0) navigate("/cart")
+    else {
+      const itemsPrice = cartItems
+        .reduce((a, i) => a + i.price * i.qty, 0)
+        .toFixed(2)
+      setPrice(itemsPrice)
+      setTotalPrice(itemsPrice < 100 ? parseFloat(itemsPrice) + 10 : itemsPrice)
+    }
   }, [userInfo, cartItems])
+
+  useEffect(() => {
+    if (success) {
+      navigate(`/order/${order._id}`)
+    }
+  }, [success, order])
 
   const applyCouponHandle = () => {
     dispatch(applyDiscount(coupon, totalPrice))
   }
 
-  const placeOrderHandle = () => {}
+  const placeOrderHandle = () => {
+    if (cartItems.length !== 0 && userInfo) {
+      dispatch(
+        createOrder({
+          orderItems: cartItems,
+          shippingAddress: {
+            address,
+            city,
+            postalCode,
+            country,
+          },
+          paymentMethod,
+          price,
+          totalPrice,
+          shippingPrice: price < 100 ? 10 : 0,
+          coupon: discount.couponInfo
+            ? {
+                code: discount.couponInfo.code,
+                isPercent: discount.couponInfo.isPercent,
+                amount: discount.couponInfo.amount,
+              }
+            : null,
+        })
+      )
+    }
+  }
 
   const couponChange = e => {
     setCoupon(e.target.value)
@@ -96,6 +131,7 @@ const PlaceOrder = () => {
       </Container>
       <Container className={classes.orderContainer}>
         <Typography variant="h1">PLACE ORDER</Typography>
+        {error && <Alert severity="error">{error}</Alert>}
         <Grid container spacing={2} style={{ marginTop: 30 }}>
           <Grid item md={8} sm={12} xs={12}>
             <Card style={{ padding: "20px 10px" }}>
@@ -176,6 +212,7 @@ const PlaceOrder = () => {
               totalPrice={totalPrice}
               btnText={"PLACE ORDER"}
               btnHandle={placeOrderHandle}
+              loading={loading}
               showCoupon
               coupon={coupon}
               setCoupon={couponChange}

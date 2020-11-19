@@ -96,7 +96,11 @@ const PaymentCard = ({
             {couponInfo && (
               <TableRow>
                 <TableCell>Coupon Applied: "{couponInfo.code}"</TableCell>
-                <TableCell align="right">{couponInfo.discount}</TableCell>
+                <TableCell align="right">
+                  {couponInfo.isPercent
+                    ? `${couponInfo.amount}%`
+                    : `$${couponInfo.amount}`}
+                </TableCell>
               </TableRow>
             )}
             <TableRow>
@@ -119,6 +123,7 @@ const PaymentCard = ({
             disabled={loading || couponLoading}
           >
             {btnText}
+            {loading && <Loader button />}
           </Button>
         </div>
       </TableContainer>
@@ -156,7 +161,7 @@ const PaymentCard = ({
                   variant="contained"
                   color="primary"
                   onClick={applyCouponHandle}
-                  disabled={couponLoading}
+                  disabled={couponLoading || loading}
                 >
                   Apply
                   {couponLoading && <Loader button />}
