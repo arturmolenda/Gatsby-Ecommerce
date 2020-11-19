@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import { navigate, Link } from "gatsby"
 
 import { useDispatch, useSelector } from "react-redux"
+import { applyDiscount } from "../../redux/actions/discountActions"
 
 import {
   Card,
@@ -21,6 +22,7 @@ import Steps from "../Steps"
 import Image from "../Image"
 import EditIcon from "@material-ui/icons/Edit"
 import PaymentCard from "../PaymentCard"
+import { useEffect } from "react"
 
 const useStyles = makeStyles(theme => ({
   divideContainers: {
@@ -49,27 +51,42 @@ const useStyles = makeStyles(theme => ({
 
 const PlaceOrder = () => {
   const [coupon, setCoupon] = useState("")
+  const [price, setPrice] = useState(0)
+  const [totalPrice, setTotalPrice] = useState(0)
   const classes = useStyles()
   const dispatch = useDispatch()
+
+  const { userInfo } = useSelector(state => state.userLogin)
   const {
     cartItems,
     shippingAddress: { address, city, postalCode, country },
     paymentMethod,
   } = useSelector(state => state.cart)
-
-  const loading = false
-  const couponError = false
+  let discount = useSelector(state => state.discountApply)
 
   // calculations
-  const price = cartItems.reduce((a, i) => a + i.price * i.qty, 0).toFixed(2)
-  const totalPrice = price < 100 ? parseFloat(price) + 10 : price
+  useEffect(() => {
+    const itemsPrice = cartItems
+      .reduce((a, i) => a + i.price * i.qty, 0)
+      .toFixed(2)
+    setPrice(itemsPrice)
+    setTotalPrice(itemsPrice < 100 ? parseFloat(itemsPrice) + 10 : itemsPrice)
+  }, [cartItems])
+
+  useEffect(() => {
+    if (!userInfo) navigate("/login")
+    if (cartItems.length === 0) navigate("/cart")
+  }, [userInfo, cartItems])
 
   const applyCouponHandle = () => {
-    console.log("coupon", coupon)
+    dispatch(applyDiscount(coupon, totalPrice))
   }
 
-  const placeOrderHandle = () => {
-    console.log("place")
+  const placeOrderHandle = () => {}
+
+  const couponChange = e => {
+    setCoupon(e.target.value)
+    discount.error = null
   }
 
   return (
@@ -157,14 +174,15 @@ const PlaceOrder = () => {
               title={"ORDER SUMMARY"}
               price={price}
               totalPrice={totalPrice}
-              loading={loading}
               btnText={"PLACE ORDER"}
               btnHandle={placeOrderHandle}
               showCoupon
               coupon={coupon}
-              setCoupon={setCoupon}
+              setCoupon={couponChange}
               applyCouponHandle={applyCouponHandle}
-              error={couponError}
+              couponError={discount.error}
+              couponLoading={discount.loading}
+              couponInfo={discount.couponInfo}
             />
           </Grid>
         </Grid>
