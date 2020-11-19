@@ -9,10 +9,9 @@ const createOrder = asyncHandler(async (req, res) => {
     orderItems,
     shippingAddress,
     paymentMethod,
-    itemsPrice,
-    taxPrice,
-    shippingPrice,
+    price,
     totalPrice,
+    shippingPrice,
     coupon,
   } = req.body;
   if (orderItems && orderItems.length === 0) {
@@ -24,11 +23,10 @@ const createOrder = asyncHandler(async (req, res) => {
       orderItems,
       shippingAddress,
       paymentMethod,
-      itemsPrice,
-      taxPrice,
+      price,
+      totalPrice, // price with coupon and shipping
       shippingPrice,
-      totalPrice,
-      coupon: coupon ? coupon : null,
+      coupon,
     });
     const createdOrder = await order.save();
     res.status(201).json(createdOrder);
