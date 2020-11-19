@@ -2,9 +2,10 @@ import express from 'express';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import morgan from 'morgan';
-import products from './data/products.js';
 import userRoutes from './routes/userRoutes.js';
 import productRoutes from './routes/productRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
+import discountRoutes from './routes/discountRoutes.js';
 import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 dotenv.config();
 
@@ -23,10 +24,8 @@ if (process.env.NODE_ENV === 'development') {
 
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
-
-app.get('/api/products', (req, res) => {
-  res.json(products);
-});
+app.use('/api/orders', orderRoutes);
+app.use('/api/discounts', discountRoutes);
 
 app.use(notFound);
 
