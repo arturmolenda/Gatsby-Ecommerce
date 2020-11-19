@@ -14,12 +14,14 @@ import {
 } from "./reducers/userReducers"
 import { productListReducer } from "./reducers/productReducers"
 import { cartReducer } from "./reducers/cartReducers"
+import { discountApplyReducer } from "./reducers/discountReducers"
 const reducer = combineReducers({
   userLogin: userLoginReducer,
   userRegister: userRegisterReducer,
   userUpdate: userUpdateReducer,
   productList: productListReducer,
   cart: cartReducer,
+  discountApply: discountApplyReducer,
 })
 
 let userInfoFromStorage,

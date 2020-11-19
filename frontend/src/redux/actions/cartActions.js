@@ -7,6 +7,7 @@ import {
 } from "../constants/cartConstants"
 
 import axios from "axios"
+import { DISCOUNT_VALIDATE_RESET } from "../constants/discountConstats"
 
 export const addToCart = (id, qty) => async (dispatch, getState) => {
   dispatch({ type: CART_ADD_ITEM_REQUEST, payload: id })
@@ -24,7 +25,7 @@ export const addToCart = (id, qty) => async (dispatch, getState) => {
       qty,
     },
   })
-  console.log(getState())
+  dispatch({ type: DISCOUNT_VALIDATE_RESET })
   localStorage.setItem("cartItems", JSON.stringify(getState().cart.cartItems))
 }
 
@@ -33,6 +34,7 @@ export const removeFromCart = id => async (dispatch, getState) => {
     type: CART_REMOVE_ITEM,
     payload: id,
   })
+  dispatch({ type: DISCOUNT_VALIDATE_RESET })
   localStorage.setItem("cartItems", JSON.stringify(getState().cart.cartItems))
 }
 
