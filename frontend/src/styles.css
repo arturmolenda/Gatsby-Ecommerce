@@ -45,3 +45,7 @@ h1.MuiTypography-h1 {
 .underline:hover {
   text-decoration: underline;
 }
+
+th.MuiTableCell-head {
+  font-weight: 600;
+}
