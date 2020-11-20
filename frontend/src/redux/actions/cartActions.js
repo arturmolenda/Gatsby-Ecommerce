@@ -12,8 +12,6 @@ import { DISCOUNT_VALIDATE_RESET } from "../constants/discountConstats"
 export const addToCart = (id, qty) => async (dispatch, getState) => {
   dispatch({ type: CART_ADD_ITEM_REQUEST, payload: id })
   const { data } = await axios.get(`/api/products?id=${id}`)
-  console.log(data)
-  console.log(getState())
   dispatch({
     type: CART_ADD_ITEM_SUCCESS,
     payload: {

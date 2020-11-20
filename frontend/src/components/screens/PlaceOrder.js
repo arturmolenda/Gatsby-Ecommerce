@@ -25,6 +25,9 @@ import PaymentCard from "../PaymentCard"
 import { useEffect } from "react"
 import { createOrder } from "../../redux/actions/orderActions"
 import { Alert } from "@material-ui/lab"
+import { ORDER_CREATE_RESET } from "../../redux/constants/orderConstants"
+import { CART_DELETE_ITEMS } from "../../redux/constants/cartConstants"
+import CouponCard from "../CouponCard"
 
 const useStyles = makeStyles(theme => ({
   divideContainers: {
@@ -84,6 +87,7 @@ const PlaceOrder = () => {
 
   useEffect(() => {
     if (success) {
+      dispatch({ type: ORDER_CREATE_RESET })
       navigate(`/order/${order._id}`)
     }
   }, [success, order])
@@ -105,7 +109,9 @@ const PlaceOrder = () => {
           },
           paymentMethod,
           price,
-          totalPrice,
+          totalPrice: discount.couponInfo
+            ? discount.couponInfo.newPrice
+            : totalPrice,
           shippingPrice: price < 100 ? 10 : 0,
           coupon: discount.couponInfo
             ? {
@@ -134,7 +140,7 @@ const PlaceOrder = () => {
         {error && <Alert severity="error">{error}</Alert>}
         <Grid container spacing={2} style={{ marginTop: 30 }}>
           <Grid item md={8} sm={12} xs={12}>
-            <Card style={{ padding: "20px 10px" }}>
+            <Card style={{ padding: "23.5px 10px" }}>
               <div className={classes.divideContainers}>
                 <div className={classes.textContainer}>
                   <Typography className={classes.textHeader} variant="h2">
@@ -213,13 +219,17 @@ const PlaceOrder = () => {
               btnText={"PLACE ORDER"}
               btnHandle={placeOrderHandle}
               loading={loading}
-              showCoupon
+              disableBtn={discount.loading}
+              couponInfo={discount.couponInfo}
+            />
+            <CouponCard
               coupon={coupon}
+              couponLoading={discount.loading}
+              couponError={discount.error}
               setCoupon={couponChange}
               applyCouponHandle={applyCouponHandle}
-              couponError={discount.error}
-              couponLoading={discount.loading}
               couponInfo={discount.couponInfo}
+              disableBtn={loading}
             />
           </Grid>
         </Grid>

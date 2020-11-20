@@ -8,11 +8,11 @@ const validateDiscount = asyncHandler(async (req, res) => {
   const { coupon, price } = req.body;
 
   const discount = await Discount.findOne({ code: coupon });
-
   if (discount) {
     if (
       discount.isActive &&
-      new Date().toISOString() < discount.expireDate.toISOString()
+      new Date().toISOString() < discount.expireDate.toISOString() &&
+      discount.couponsAmount > 0
     ) {
       if (discount.onePerUser) {
         const usedCoupons = req.user.usedCoupons;
