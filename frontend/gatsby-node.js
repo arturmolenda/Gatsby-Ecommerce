@@ -9,4 +9,9 @@ exports.onCreatePage = async ({ page, actions }) => {
     page.component = path.resolve("src/pages/product.js")
     createPage(page)
   }
+  if (page.path.match(/^\/order/)) {
+    page.matchPath = "/order/*"
+    page.component = path.resolve("src/pages/order.js")
+    createPage(page)
+  }
 }
