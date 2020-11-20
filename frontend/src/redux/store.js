@@ -19,6 +19,7 @@ import {
   orderCreateReducer,
   orderDetailsReducer,
   orderListMyReducer,
+  orderPayReducer,
 } from "./reducers/orderReducers"
 const reducer = combineReducers({
   userLogin: userLoginReducer,
@@ -30,6 +31,7 @@ const reducer = combineReducers({
   orderCreate: orderCreateReducer,
   orderDetails: orderDetailsReducer,
   orderListMy: orderListMyReducer,
+  orderPay: orderPayReducer,
 })
 
 let userInfoFromStorage,
