@@ -1,4 +1,7 @@
 import {
+  USER_LIST_ALL_FAIL,
+  USER_LIST_ALL_REQUEST,
+  USER_LIST_ALL_SUCCESS,
   USER_LOGIN_FAIL,
   USER_LOGIN_REQUEST,
   USER_LOGIN_SUCCESS,
@@ -97,6 +100,33 @@ export const updateUserDetails = user => async (dispatch, getState) => {
   } catch (error) {
     dispatch({
       type: USER_UPDATE_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    })
+  }
+}
+
+export const listAllUsers = user => async (dispatch, getState) => {
+  try {
+    dispatch({ type: USER_LIST_ALL_REQUEST })
+
+    const {
+      userLogin: { userInfo },
+    } = getState()
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    }
+    const { data } = await axios.get("/api/users", config)
+
+    dispatch({ type: USER_LIST_ALL_SUCCESS, payload: data })
+  } catch (error) {
+    dispatch({
+      type: USER_LIST_ALL_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message
