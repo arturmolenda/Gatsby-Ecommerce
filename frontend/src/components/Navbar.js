@@ -9,10 +9,16 @@ import AppBar from "@material-ui/core/AppBar"
 import Toolbar from "@material-ui/core/Toolbar"
 import Typography from "@material-ui/core/Typography"
 import Button from "@material-ui/core/Button"
-import IconButton from "@material-ui/core/IconButton"
-import MenuIcon from "@material-ui/icons/Menu"
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart"
-import { Badge, Menu, MenuItem } from "@material-ui/core"
+import {
+  Badge,
+  ClickAwayListener,
+  MenuItem,
+  Paper,
+  Popper,
+} from "@material-ui/core"
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore"
+
 const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
@@ -34,12 +40,16 @@ const useStyles = makeStyles(theme => ({
 
 const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState(null)
+  const [adminAnchorEl, setAdminAnchorEl] = useState(null)
   const classes = useStyles()
   const dispatch = useDispatch()
   const { userInfo } = useSelector(state => state.userLogin)
   const { cartItems } = useSelector(state => state.cart)
 
-  const logoutHandle = () => dispatch(logout())
+  const logoutHandle = () => {
+    dispatch(logout())
+    setAnchorEl(null)
+  }
 
   return (
     <div className={classes.root}>
@@ -66,15 +76,67 @@ const Navbar = () => {
           </Link>
           {userInfo ? (
             <>
+              {userInfo.isAdmin && (
+                <>
+                  <Button
+                    className={classes.link}
+                    color="inherit"
+                    onClick={e => setAdminAnchorEl(e.currentTarget)}
+                    endIcon={<ExpandMoreIcon />}
+                  >
+                    admin
+                  </Button>
+                  <Popper
+                    anchorEl={adminAnchorEl}
+                    open={Boolean(adminAnchorEl)}
+                    getContentAnchorEl={null}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "left",
+                    }}
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "left",
+                    }}
+                  >
+                    <ClickAwayListener
+                      onClickAway={() => setAdminAnchorEl(null)}
+                    >
+                      <Paper style={{ minWidth: 150, padding: "8px 0" }}>
+                        <Link to="/admin/users">
+                          <MenuItem onClick={() => setAdminAnchorEl(null)}>
+                            Users
+                          </MenuItem>
+                        </Link>
+                        <Link to="/admin/products">
+                          <MenuItem onClick={() => setAdminAnchorEl(null)}>
+                            Products
+                          </MenuItem>
+                        </Link>
+                        <Link to="/admin/orders">
+                          <MenuItem onClick={() => setAdminAnchorEl(null)}>
+                            Orders
+                          </MenuItem>
+                        </Link>
+                        <Link to="/admin/discounts">
+                          <MenuItem onClick={() => setAdminAnchorEl(null)}>
+                            Discounts
+                          </MenuItem>
+                        </Link>
+                      </Paper>
+                    </ClickAwayListener>
+                  </Popper>
+                </>
+              )}
               <Button
                 className={classes.link}
                 color="inherit"
                 onClick={e => setAnchorEl(e.currentTarget)}
+                endIcon={<ExpandMoreIcon />}
               >
                 {userInfo.name}
               </Button>
-              <Menu
-                onClose={() => setAnchorEl(null)}
+              <Popper
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}
                 getContentAnchorEl={null}
@@ -87,13 +149,17 @@ const Navbar = () => {
                   horizontal: "left",
                 }}
               >
-                <div style={{ minWidth: 150 }}>
-                  <Link to="/profile">
-                    <MenuItem>Profile</MenuItem>
-                  </Link>
-                  <MenuItem onClick={logoutHandle}>Logout</MenuItem>
-                </div>
-              </Menu>
+                <ClickAwayListener onClickAway={() => setAnchorEl(null)}>
+                  <Paper style={{ minWidth: 150, padding: "8px 0" }}>
+                    <Link to="/profile">
+                      <MenuItem onClick={() => setAnchorEl(null)}>
+                        Profile
+                      </MenuItem>
+                    </Link>
+                    <MenuItem onClick={logoutHandle}>Logout</MenuItem>
+                  </Paper>
+                </ClickAwayListener>
+              </Popper>
             </>
           ) : (
             <>
