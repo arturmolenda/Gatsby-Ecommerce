@@ -115,7 +115,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 // @route   Get /api/users
 // @access  Private/Admin
 const getUsers = asyncHandler(async (req, res) => {
-  const users = await User.find();
+  const users = await User.find().select('-password');
   res.json(users);
 });
 
