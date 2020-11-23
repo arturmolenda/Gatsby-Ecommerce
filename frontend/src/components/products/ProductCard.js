@@ -7,6 +7,7 @@ const useStyles = makeStyles(() => ({
     position: "relative",
     transition: "top .2s ease",
     top: 0,
+    cursor: "pointer",
     "&:hover": {
       top: -2,
     },
@@ -20,29 +21,64 @@ const useStyles = makeStyles(() => ({
     textOverflow: "ellipsis",
   },
 }))
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, disableLink, sampleProduct }) => {
   const classes = useStyles()
   return (
     <>
-      <Card className={classes.cardContainer}>
-        <Link to={`/product/${product._id}`}>
-          <div style={{ maxWidth: 300 }}>
-            <Image alt={product.name} filename={product.images[0].image} />
-          </div>
-          <CardContent className={classes.contentContainer}>
-            <Typography className={classes.textEllipsis} variant="caption">
-              {product.brand}
-            </Typography>
-            <Typography
-              className={classes.textEllipsis}
-              style={{ fontSize: "1.15rem" }}
-              variant="h6"
-            >
-              {product.name}
-            </Typography>
-            <Typography variant="h6">${product.price}</Typography>
-          </CardContent>
-        </Link>
+      <Card
+        className={classes.cardContainer}
+        style={{
+          filter: sampleProduct && "blur(1.5px)",
+        }}
+      >
+        <div style={{ pointerEvents: disableLink && "none" }}>
+          <Link to={`/product/${product._id}`}>
+            <div style={{ position: "relative" }}>
+              <div />
+              {disableLink && product.images[0].image && !sampleProduct ? (
+                product.images[0].local ? (
+                  <Image
+                    alt={product.name}
+                    filename={product.images[0].image}
+                  />
+                ) : (
+                  <img
+                    src={
+                      product.images[0].blob
+                        ? product.images[0].blob
+                        : product.images[0].image
+                    }
+                    style={{ width: "100%" }}
+                  />
+                )
+              ) : (
+                <Image
+                  alt={product.name}
+                  filename={
+                    product.images[0].image
+                      ? product.images[0].image
+                      : "productPlaceholder.jpg"
+                  }
+                />
+              )}
+            </div>
+            <CardContent className={classes.contentContainer}>
+              <Typography className={classes.textEllipsis} variant="caption">
+                {product.brand}
+              </Typography>
+              <Typography
+                className={classes.textEllipsis}
+                style={{ fontSize: "1.15rem" }}
+                variant="h6"
+              >
+                {product.name}
+              </Typography>
+              <Typography variant="h6">
+                ${parseFloat(product.price).toFixed(2)}
+              </Typography>
+            </CardContent>
+          </Link>
+        </div>
       </Card>
     </>
   )

@@ -28,7 +28,7 @@ const QtySelect = ({
                 {val + 1}
               </option>
             ))
-          : [...Array(countInStock + 1).keys()].map(val => (
+          : [...Array(Number(countInStock)).keys()].map(val => (
               <option key={val} value={val + 1}>
                 {val + 1}
               </option>
