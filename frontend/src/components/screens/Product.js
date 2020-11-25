@@ -21,6 +21,7 @@ import Image from "../Image"
 import Loader from "../Loader"
 import Rating from "../Rating"
 import QtySelect from "../QtySelect"
+import ProductLabels from "../products/ProductLabels"
 
 const useStyles = makeStyles(theme => ({
   imageMiniature: {
@@ -37,6 +38,10 @@ const useStyles = makeStyles(theme => ({
     [theme.breakpoints.down("sm")]: {
       display: "flex",
     },
+  },
+  imgContainer: {
+    position: "relative",
+    display: "grid",
   },
   descriptionContainer: {
     ["@media (min-width: 1024px)"]: {
@@ -71,7 +76,6 @@ const Product = ({ id, location, previewProduct }) => {
         setCurrentImage(foundProduct.images[0])
       }
     } else if (products.length === 0) {
-      console.log(products.length)
       dispatch(listProducts())
     }
     if (previewProduct) {
@@ -171,34 +175,42 @@ const Product = ({ id, location, previewProduct }) => {
                   sm={12}
                   xs={12}
                 >
-                  {previewProduct && currentImage.image ? (
-                    currentImage.local ? (
+                  <div className={classes.imgContainer}>
+                    {previewProduct && currentImage.image ? (
+                      currentImage.local ? (
+                        <Image
+                          alt={
+                            currentImage.description && currentImage.description
+                          }
+                          filename={currentImage.image}
+                        />
+                      ) : (
+                        <img
+                          src={
+                            currentImage.blob
+                              ? currentImage.blob
+                              : currentImage.image
+                          }
+                          style={{ width: "100%" }}
+                        />
+                      )
+                    ) : (
                       <Image
                         alt={
                           currentImage.description && currentImage.description
                         }
-                        filename={currentImage.image}
-                      />
-                    ) : (
-                      <img
-                        src={
-                          currentImage.blob
-                            ? currentImage.blob
-                            : currentImage.image
+                        filename={
+                          currentImage.image
+                            ? currentImage.image
+                            : "productPlaceholder.jpg"
                         }
-                        style={{ width: "100%" }}
                       />
-                    )
-                  ) : (
-                    <Image
-                      alt={currentImage.description && currentImage.description}
-                      filename={
-                        currentImage.image
-                          ? currentImage.image
-                          : "productPlaceholder.jpg"
-                      }
+                    )}
+                    <ProductLabels
+                      labels={product.labels}
+                      discount={product.discount}
                     />
-                  )}
+                  </div>
                 </Grid>
               </Grid>
               <Grid item md={4} sm={5} xs={12}>
@@ -213,8 +225,26 @@ const Product = ({ id, location, previewProduct }) => {
                     {product.name}
                   </Typography>
                   <Typography style={{ marginTop: 6 }} variant="h6">
-                    ${product.price}{" "}
-                    <Typography variant="caption">(tax included)</Typography>
+                    {product.discount &&
+                    product.discount.amount > 0 &&
+                    product.discount.expireDate > new Date().toISOString() ? (
+                      <>
+                        <span style={{ color: "#eb0037" }}>
+                          <p style={{ margin: 0 }}>
+                            - {product.discount.amount}%
+                          </p>
+                          <span style={{ fontWeight: 600, marginRight: 8 }}>
+                            ${product.discount.totalPrice}
+                          </span>
+                        </span>
+                        <span style={{ textDecoration: "line-through" }}>
+                          ${parseFloat(product.price).toFixed(2)}
+                        </span>
+                      </>
+                    ) : (
+                      `$${parseFloat(product.price).toFixed(2)}`
+                    )}
+                    <Typography variant="caption"> (tax included)</Typography>
                   </Typography>
                   <div style={{ marginTop: 10 }}>
                     <Rating

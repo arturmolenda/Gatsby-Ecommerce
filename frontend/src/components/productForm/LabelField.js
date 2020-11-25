@@ -27,7 +27,6 @@ const LabelField = ({ labels, setLabels }) => {
   const classes = useStyles()
 
   const updateLabel = (e, i) => {
-    // console.log(labels, e.target.value)
     e.persist()
     setLabels(prevLabels => {
       prevLabels[i][e.target.name] = e.target.value
@@ -81,7 +80,7 @@ const LabelField = ({ labels, setLabels }) => {
           <IconButton
             color="primary"
             onClick={() => deleteLabel(i)}
-            style={{ cursor: "pointer" }}
+            style={{ padding: 6 }}
           >
             <DeleteIcon />
           </IconButton>

@@ -1,5 +1,7 @@
 import React from "react"
 
+import { useStaticQuery, graphql } from "gatsby"
+
 import {
   Button,
   Fab,
@@ -36,15 +38,36 @@ const useStyles = makeStyles(() => ({
 }))
 
 const ImagesUpload = ({ images, setImages }) => {
+  const data = useStaticQuery(graphql`
+    query {
+      images: allFile {
+        edges {
+          node {
+            relativePath
+          }
+        }
+      }
+    }
+  `)
   const classes = useStyles()
+
+  console.log(data)
 
   const updateImages = (e, i) => {
     e.persist()
     setImages(prevImages => {
       prevImages[i][e.target.name] = e.target.value
       if (e.target.name === "image") {
+        const image = data.images.edges.find(n => {
+          return n.node.relativePath === e.target.value
+        })
         delete prevImages[i].blob
         delete prevImages[i].formData
+        if (!image) {
+          prevImages[i].local = false
+        } else {
+          prevImages[i].local = true
+        }
       }
       return [...prevImages]
     })
@@ -90,6 +113,7 @@ const ImagesUpload = ({ images, setImages }) => {
           prevImages[i].image = `${newFile.name}.${fileType}`
           prevImages[i].blob = imageDisplay
           prevImages[i].formData = imageFormData
+          prevImages[i].local = false
           return [...prevImages]
         })
       }
@@ -100,44 +124,46 @@ const ImagesUpload = ({ images, setImages }) => {
       {images.map((item, i) => (
         <div className={classes.flexContainer} key={i}>
           <div className={classes.inputContainer}>
-            {images.length > 1 && (
-              <IconButton
-                color="primary"
-                onClick={() => deleteImage(i)}
-                style={{ cursor: "pointer" }}
-              >
-                <DeleteIcon />
-              </IconButton>
-            )}
-            <TextField
-              fullWidth
-              type="text"
-              label="Upload or enter url"
-              name="image"
-              margin="dense"
-              variant="filled"
-              value={item.image}
-              onChange={e => updateImages(e, i)}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Fab
-                      color="primary"
-                      onClick={() => handleSelectPicture(i)}
-                      size="small"
-                    >
-                      <input
-                        id={`imageUpload-${i}`}
-                        type="file"
-                        hidden="hidden"
-                        onChange={e => handleImageChange(e, i)}
-                      />
-                      <AddIcon />
-                    </Fab>
-                  </InputAdornment>
-                ),
-              }}
-            />
+            <div className={classes.flexContainer}>
+              <TextField
+                fullWidth
+                type="text"
+                label="Upload or enter url"
+                name="image"
+                margin="dense"
+                variant="filled"
+                value={item.image}
+                onChange={e => updateImages(e, i)}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Fab
+                        color="primary"
+                        onClick={() => handleSelectPicture(i)}
+                        size="small"
+                      >
+                        <input
+                          id={`imageUpload-${i}`}
+                          type="file"
+                          hidden="hidden"
+                          onChange={e => handleImageChange(e, i)}
+                        />
+                        <AddIcon />
+                      </Fab>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              {images.length > 1 && (
+                <IconButton
+                  color="primary"
+                  onClick={() => deleteImage(i)}
+                  style={{ padding: 6 }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              )}
+            </div>
             <TextField
               fullWidth
               type="text"

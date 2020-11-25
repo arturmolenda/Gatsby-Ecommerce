@@ -45,7 +45,11 @@ const AdminProduct = ({ id }) => {
   const [category, setCategory] = useState("Category")
   const [qty, setQty] = useState(21)
   const [brand, setBrand] = useState("Brand")
-  const [discount, setDiscount] = useState(0)
+  const [discount, setDiscount] = useState({
+    amount: 0,
+    expireDate: new Date().toISOString().substring(0, 10),
+    totalPrice: null,
+  })
   const [description, setDescription] = useState("Sample Description")
   const [showProduct, setShowProduct] = useState(false)
   const classes = useStyles()
@@ -62,6 +66,10 @@ const AdminProduct = ({ id }) => {
     numReviews: 0,
     countInStock: qty,
     description,
+    labels,
+    discount,
+    category,
+    showProduct,
   }
 
   useEffect(() => {
@@ -79,7 +87,13 @@ const AdminProduct = ({ id }) => {
         setCategory(productToEdit.category)
         setQty(productToEdit.countInStock)
         setBrand(productToEdit.brand)
-        setDiscount(productToEdit.discount)
+        if (
+          productToEdit.discount &&
+          productToEdit.discount.amount &&
+          productToEdit.discount.expireDate
+        ) {
+          setDiscount(productToEdit.discount)
+        }
         setDescription(productToEdit.description)
         setShowProduct(productToEdit.show)
         if (productToEdit.images.length !== 0) {
@@ -95,8 +109,8 @@ const AdminProduct = ({ id }) => {
     }
   }, [products, id])
 
-  const deleteLabel = i => {
-    console.log("delete", i)
+  const submitHandle = e => {
+    e.preventDefault()
   }
 
   return (
@@ -175,14 +189,14 @@ const AdminProduct = ({ id }) => {
                 brand={brand}
                 brandChange={e => setBrand(e.target.value)}
                 discount={discount}
-                discountChange={e => setDiscount(e.target.value)}
+                setDiscount={setDiscount}
                 description={description}
                 descriptionChange={e => setDescription(e.target.value)}
                 labels={labels}
                 setLabels={setLabels}
-                deleteLabel={deleteLabel}
                 showProduct={showProduct}
                 showProductChange={e => setShowProduct(e.target.checked)}
+                submitHandle={submitHandle}
               />
             </Grid>
           </Grid>
