@@ -39,7 +39,6 @@ const ProductForm = ({
   setLabels,
   showProduct,
   showProductChange,
-  submitHandle,
 }) => {
   const classes = useStyles()
   const updateDiscount = (e, name) => {
@@ -68,10 +67,7 @@ const ProductForm = ({
 
   console.log(discount)
   return (
-    <form
-      onSubmit={submitHandle}
-      style={{ display: "flex", flexDirection: "column" }}
-    >
+    <>
       <Typography variant="h3" className={classes.header}>
         IMAGES
       </Typography>
@@ -80,6 +76,7 @@ const ProductForm = ({
         PRODUCT DETAILS
       </Typography>
       <TextField
+        required
         type="text"
         label="Name"
         variant="filled"
@@ -88,6 +85,7 @@ const ProductForm = ({
         onChange={nameChange}
       />
       <TextField
+        required
         type="number"
         label="Price"
         variant="filled"
@@ -96,6 +94,7 @@ const ProductForm = ({
         onChange={e => updatePrice(e)}
       />
       <TextField
+        required
         type="text"
         label="Category"
         variant="filled"
@@ -104,6 +103,7 @@ const ProductForm = ({
         onChange={categoryChange}
       />
       <TextField
+        required
         type="number"
         label="Count In Stock"
         variant="filled"
@@ -112,6 +112,7 @@ const ProductForm = ({
         onChange={qtyChange}
       />
       <TextField
+        required
         type="text"
         label="Brand"
         variant="filled"
@@ -120,6 +121,7 @@ const ProductForm = ({
         onChange={brandChange}
       />
       <TextField
+        required
         type="text"
         label="Description"
         variant="filled"
@@ -161,16 +163,7 @@ const ProductForm = ({
         }
         label="Show Product"
       />
-      <Button
-        type="submit"
-        variant="contained"
-        color="primary"
-        size="large"
-        style={{ marginTop: 15 }}
-      >
-        Save
-      </Button>
-    </form>
+    </>
   )
 }
 

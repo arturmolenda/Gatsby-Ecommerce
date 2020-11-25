@@ -50,6 +50,7 @@ const LabelField = ({ labels, setLabels }) => {
         <div className={classes.flexContainer} key={i}>
           <div className={classes.inputContainer}>
             <TextField
+              required
               type="text"
               label="Label"
               name="labelText"
@@ -59,6 +60,7 @@ const LabelField = ({ labels, setLabels }) => {
               onChange={e => updateLabel(e, i)}
             />
             <TextField
+              required
               type="text"
               label="Text Color"
               name="color"
@@ -68,6 +70,7 @@ const LabelField = ({ labels, setLabels }) => {
               onChange={e => updateLabel(e, i)}
             />
             <TextField
+              required
               type="text"
               label="Bg Color"
               name="bgColor"

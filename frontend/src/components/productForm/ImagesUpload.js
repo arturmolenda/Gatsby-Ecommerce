@@ -62,6 +62,7 @@ const ImagesUpload = ({ images, setImages }) => {
           return n.node.relativePath === e.target.value
         })
         delete prevImages[i].blob
+        delete prevImages[i].error
         delete prevImages[i].formData
         if (!image) {
           prevImages[i].local = false
@@ -114,6 +115,7 @@ const ImagesUpload = ({ images, setImages }) => {
           prevImages[i].blob = imageDisplay
           prevImages[i].formData = imageFormData
           prevImages[i].local = false
+          delete prevImages[i].error
           return [...prevImages]
         })
       }
@@ -126,6 +128,7 @@ const ImagesUpload = ({ images, setImages }) => {
           <div className={classes.inputContainer}>
             <div className={classes.flexContainer}>
               <TextField
+                required
                 fullWidth
                 type="text"
                 label="Upload or enter url"
@@ -133,6 +136,8 @@ const ImagesUpload = ({ images, setImages }) => {
                 margin="dense"
                 variant="filled"
                 value={item.image}
+                error={item.error}
+                helperText={item.error}
                 onChange={e => updateImages(e, i)}
                 InputProps={{
                   endAdornment: (
@@ -183,6 +188,7 @@ const ImagesUpload = ({ images, setImages }) => {
         variant="contained"
         onClick={addImage}
         startIcon={<AddIcon />}
+        error
       >
         Add Image
       </Button>

@@ -11,6 +11,7 @@ import ProductForm from "../../productForm/ProductForm"
 import ProductCard from "../../products/ProductCard"
 import Loader from "../../Loader"
 import Product from "../Product"
+import { Alert } from "@material-ui/lab"
 
 const useStyles = makeStyles(theme => ({
   sampleProduct: {
@@ -26,6 +27,7 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const AdminProduct = ({ id }) => {
+  const [formError, setFormError] = useState(false)
   const [name, setName] = useState("Sample Name")
   const [price, setPrice] = useState(1337.99)
   const [images, setImages] = useState([
@@ -111,6 +113,27 @@ const AdminProduct = ({ id }) => {
 
   const submitHandle = e => {
     e.preventDefault()
+    let formValid = true
+    images.map((imgObj, i) => {
+      if (!imgObj.local && !imgObj.blob && !imgObj.formData) {
+        const validateImg = new Image()
+        validateImg.src = imgObj.image
+        validateImg.onerror = () => {
+          console.log("error")
+          formValid = false
+          setFormError(true)
+          setImages(prevImages => {
+            prevImages[i].error =
+              "Image does not exist in give url! can't proceed"
+            return [...prevImages]
+          })
+        }
+      }
+    })
+    if (formValid) {
+      setFormError(false)
+      console.log("xd321")
+    }
   }
 
   return (
@@ -175,29 +198,47 @@ const AdminProduct = ({ id }) => {
               <Typography variant="h1" align="center">
                 CREATE NEW PRODUCT
               </Typography>
-              <ProductForm
-                name={name}
-                nameChange={e => setName(e.target.value)}
-                price={price}
-                priceChange={e => setPrice(e.target.value)}
-                images={images}
-                setImages={setImages}
-                category={category}
-                categoryChange={e => setCategory(e.target.value)}
-                qty={qty}
-                qtyChange={e => setQty(e.target.value)}
-                brand={brand}
-                brandChange={e => setBrand(e.target.value)}
-                discount={discount}
-                setDiscount={setDiscount}
-                description={description}
-                descriptionChange={e => setDescription(e.target.value)}
-                labels={labels}
-                setLabels={setLabels}
-                showProduct={showProduct}
-                showProductChange={e => setShowProduct(e.target.checked)}
-                submitHandle={submitHandle}
-              />
+              <form
+                onSubmit={submitHandle}
+                style={{ display: "flex", flexDirection: "column" }}
+              >
+                <ProductForm
+                  name={name}
+                  nameChange={e => setName(e.target.value)}
+                  price={price}
+                  priceChange={e => setPrice(e.target.value)}
+                  images={images}
+                  setImages={setImages}
+                  category={category}
+                  categoryChange={e => setCategory(e.target.value)}
+                  qty={qty}
+                  qtyChange={e => setQty(e.target.value)}
+                  brand={brand}
+                  brandChange={e => setBrand(e.target.value)}
+                  discount={discount}
+                  setDiscount={setDiscount}
+                  description={description}
+                  descriptionChange={e => setDescription(e.target.value)}
+                  labels={labels}
+                  setLabels={setLabels}
+                  showProduct={showProduct}
+                  showProductChange={e => setShowProduct(e.target.checked)}
+                />
+                {formError && (
+                  <Alert severity="error">There's an error in your form!</Alert>
+                )}
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  style={{ marginTop: 15 }}
+                  // disabled={validateLoading}
+                >
+                  Save
+                  {/* {validateLoading && <Loader button />} */}
+                </Button>
+              </form>
             </Grid>
           </Grid>
         </Grid>
