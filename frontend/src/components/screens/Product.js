@@ -1,29 +1,28 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
+import { Link } from "gatsby"
 
 import { useDispatch, useSelector } from "react-redux"
 import { addToCart } from "../../redux/actions/cartActions"
+import { listProducts } from "../../redux/actions/productActions"
 
-import { Link } from "gatsby"
 import {
   Button,
   Divider,
-  FormControl,
   Grid,
-  InputLabel,
   makeStyles,
-  Select,
   Snackbar,
   Typography,
 } from "@material-ui/core"
-import { useEffect } from "react"
 import { Alert } from "@material-ui/lab"
-import { listProducts } from "../../redux/actions/productActions"
+import ArrowBackIcon from "@material-ui/icons/ArrowBack"
+import AddIcon from "@material-ui/icons/Add"
+
 import Image from "../Image"
 import Loader from "../Loader"
 import Rating from "../Rating"
-import ArrowBackIcon from "@material-ui/icons/ArrowBack"
-import AddIcon from "@material-ui/icons/Add"
 import QtySelect from "../QtySelect"
+import ProductLabels from "../products/ProductLabels"
+
 const useStyles = makeStyles(theme => ({
   imageMiniature: {
     cursor: "pointer",
@@ -40,6 +39,10 @@ const useStyles = makeStyles(theme => ({
       display: "flex",
     },
   },
+  imgContainer: {
+    position: "relative",
+    display: "grid",
+  },
   descriptionContainer: {
     ["@media (min-width: 1024px)"]: {
       marginLeft: "8%",
@@ -53,7 +56,7 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
-const Product = ({ id, location }) => {
+const Product = ({ id, location, previewProduct }) => {
   const [product, setProduct] = useState()
   const [currentImage, setCurrentImage] = useState()
   const [quantity, setQuantity] = useState(1)
@@ -63,36 +66,44 @@ const Product = ({ id, location }) => {
   const { loading, products, success, error } = useSelector(
     state => state.productList
   )
-  const backLink = location.search ? `/${location.search.split("=")[1]}` : "/"
+  const backLink =
+    location && location.search ? `/${location.search.split("=")[1]}` : "/"
   useEffect(() => {
-    if (products.length !== 0) {
+    if (products.length !== 0 && !previewProduct) {
       const foundProduct = products.find(product => product._id === id)
       if (foundProduct) {
         setProduct(foundProduct)
         setCurrentImage(foundProduct.images[0])
       }
     } else if (products.length === 0) {
-      console.log(products.length)
       dispatch(listProducts())
     }
-  }, [dispatch, success])
+    if (previewProduct) {
+      setProduct(previewProduct)
+      setCurrentImage(previewProduct.images[0])
+    }
+  }, [dispatch, success, previewProduct])
 
   const hoverHandle = imgObj => {
     setCurrentImage(imgObj)
   }
 
   const addToCartHandle = () => {
-    dispatch(addToCart(product._id, quantity))
-    setSuccessAlert(true)
+    if (!previewProduct) {
+      dispatch(addToCart(product._id, quantity))
+      setSuccessAlert(true)
+    }
   }
   console.log(backLink)
   return (
     <>
-      <Link to={backLink} replace>
-        <Button startIcon={<ArrowBackIcon />} style={{ marginBottom: 10 }}>
-          Go back
-        </Button>
-      </Link>
+      {!previewProduct && (
+        <Link to={backLink} replace>
+          <Button startIcon={<ArrowBackIcon />} style={{ marginBottom: 10 }}>
+            Go back
+          </Button>
+        </Link>
+      )}
       {loading ? (
         <Loader />
       ) : error ? (
@@ -104,7 +115,7 @@ const Product = ({ id, location }) => {
               container
               spacing={2}
               alignItems="flex-start"
-              justify="center"
+              justify="flex-start"
             >
               <Grid
                 container
@@ -126,24 +137,80 @@ const Product = ({ id, location }) => {
                           key={index}
                           style={{
                             marginTop: index !== 0 && 10,
+
                             outline:
                               currentImage.image === imgObj.image &&
                               "2px solid #4e4e4e",
                           }}
                         >
-                          <Image
-                            alt={imgObj.description}
-                            filename={imgObj.image}
-                          />
+                          {previewProduct && imgObj.image ? (
+                            imgObj.local ? (
+                              <Image
+                                alt={imgObj.description && imgObj.description}
+                                filename={imgObj.image}
+                              />
+                            ) : (
+                              <img
+                                src={imgObj.blob ? imgObj.blob : imgObj.image}
+                                style={{ width: "100%", display: "flex" }}
+                              />
+                            )
+                          ) : (
+                            <Image
+                              alt={imgObj.description && imgObj.description}
+                              filename={
+                                imgObj.image
+                                  ? imgObj.image
+                                  : "productPlaceholder.jpg"
+                              }
+                            />
+                          )}
                         </div>
                       ))}
                   </div>
                 </Grid>
-                <Grid item md={10} sm={12} xs={12}>
-                  <Image
-                    alt={currentImage.description}
-                    filename={currentImage.image}
-                  />
+                <Grid
+                  item
+                  md={product.images.length > 1 ? 10 : 12}
+                  sm={12}
+                  xs={12}
+                >
+                  <div className={classes.imgContainer}>
+                    {previewProduct && currentImage.image ? (
+                      currentImage.local ? (
+                        <Image
+                          alt={
+                            currentImage.description && currentImage.description
+                          }
+                          filename={currentImage.image}
+                        />
+                      ) : (
+                        <img
+                          src={
+                            currentImage.blob
+                              ? currentImage.blob
+                              : currentImage.image
+                          }
+                          style={{ width: "100%" }}
+                        />
+                      )
+                    ) : (
+                      <Image
+                        alt={
+                          currentImage.description && currentImage.description
+                        }
+                        filename={
+                          currentImage.image
+                            ? currentImage.image
+                            : "productPlaceholder.jpg"
+                        }
+                      />
+                    )}
+                    <ProductLabels
+                      labels={product.labels}
+                      discount={product.discount}
+                    />
+                  </div>
                 </Grid>
               </Grid>
               <Grid item md={4} sm={5} xs={12}>
@@ -158,8 +225,26 @@ const Product = ({ id, location }) => {
                     {product.name}
                   </Typography>
                   <Typography style={{ marginTop: 6 }} variant="h6">
-                    ${product.price}{" "}
-                    <Typography variant="caption">(tax included)</Typography>
+                    {product.discount &&
+                    product.discount.amount > 0 &&
+                    product.discount.expireDate > new Date().toISOString() ? (
+                      <>
+                        <span style={{ color: "#eb0037" }}>
+                          <p style={{ margin: 0 }}>
+                            - {product.discount.amount}%
+                          </p>
+                          <span style={{ fontWeight: 600, marginRight: 8 }}>
+                            ${product.discount.totalPrice}
+                          </span>
+                        </span>
+                        <span style={{ textDecoration: "line-through" }}>
+                          ${parseFloat(product.price).toFixed(2)}
+                        </span>
+                      </>
+                    ) : (
+                      `$${parseFloat(product.price).toFixed(2)}`
+                    )}
+                    <Typography variant="caption"> (tax included)</Typography>
                   </Typography>
                   <div style={{ marginTop: 10 }}>
                     <Rating
@@ -191,8 +276,8 @@ const Product = ({ id, location }) => {
                   </div>
                 </div>
               </Grid>
+              <Divider style={{ margin: "20px 0", width: "100%" }} />
               <div>
-                <Divider style={{ margin: "20px 0" }} />
                 <Typography variant="body1">{product.description}</Typography>
               </div>
             </Grid>

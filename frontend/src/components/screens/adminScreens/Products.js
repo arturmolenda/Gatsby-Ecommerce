@@ -136,11 +136,13 @@ const Products = () => {
                     >
                       <TableCell style={{ width: 100, padding: 8 }}>
                         <Link to={`/product/${item._id}?goBack=admin/products`}>
-                          <Image
-                            alt={item.name}
-                            filename={item.images[0].image}
-                            customStyle={{ borderRadius: 6 }}
-                          />
+                          {item.images.length !== 0 && (
+                            <Image
+                              alt={item.name}
+                              filename={item.images[0].image}
+                              customStyle={{ borderRadius: 6 }}
+                            />
+                          )}
                         </Link>
                       </TableCell>
                       <TableCell>{item.brand}</TableCell>
