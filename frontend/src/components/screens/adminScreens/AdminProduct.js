@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react"
 import { Link, navigate } from "gatsby"
 
 import { useDispatch, useSelector } from "react-redux"
-import { listProducts } from "../../../redux/actions/productActions"
+import {
+  createProduct,
+  listProducts,
+  uploadProductImage,
+} from "../../../redux/actions/productActions"
 
 import { Button, Grid, makeStyles, Typography } from "@material-ui/core"
 import ArrowBackIcon from "@material-ui/icons/ArrowBack"
@@ -12,6 +16,10 @@ import ProductCard from "../../products/ProductCard"
 import Loader from "../../Loader"
 import Product from "../Product"
 import { Alert } from "@material-ui/lab"
+import {
+  PRODUCT_CREATE_RESET,
+  PRODUCT_IMAGE_UPLOAD_RESET,
+} from "../../../redux/constants/productConstants"
 
 const useStyles = makeStyles(theme => ({
   sampleProduct: {
@@ -28,6 +36,8 @@ const useStyles = makeStyles(theme => ({
 
 const AdminProduct = ({ id }) => {
   const [formError, setFormError] = useState(false)
+  const [validationLoading, setValidationLoading] = useState(false)
+  const [formData, setFormData] = useState([])
   const [name, setName] = useState("Sample Name")
   const [price, setPrice] = useState(1337.99)
   const [images, setImages] = useState([
@@ -53,11 +63,27 @@ const AdminProduct = ({ id }) => {
     totalPrice: null,
   })
   const [description, setDescription] = useState("Sample Description")
-  const [showProduct, setShowProduct] = useState(false)
+  const [showProduct, setShowProduct] = useState(true)
   const classes = useStyles()
   const dispatch = useDispatch()
   const { userInfo } = useSelector(state => state.userLogin)
-  const { loading, products } = useSelector(state => state.productList)
+  const {
+    loading: listProductsLoading,
+    products,
+    success: listProductsSuccess,
+  } = useSelector(state => state.productList)
+
+  const {
+    loading: uploadLoading,
+    error: uploadError,
+    success: uploadSuccess,
+  } = useSelector(state => state.productImageUpload)
+  const {
+    loading: createLoading,
+    error: createError,
+    product: createdProduct,
+    success: createSuccess,
+  } = useSelector(state => state.productCreate)
 
   const product = {
     name,
@@ -74,10 +100,66 @@ const AdminProduct = ({ id }) => {
     showProduct,
   }
 
+  const dispatchCurrentProduct = () =>
+    dispatch(
+      createProduct({
+        name,
+        price,
+        images,
+        brand,
+        countInStock: qty,
+        description,
+        labels,
+        discount,
+        category,
+        showProduct,
+      })
+    )
+
+  const resetReducers = () => {
+    dispatch({ type: PRODUCT_IMAGE_UPLOAD_RESET })
+    dispatch({ type: PRODUCT_CREATE_RESET })
+  }
+
+  useEffect(() => {
+    if (
+      !products ||
+      (products.length === 0 && !listProductsSuccess && !listProductsLoading)
+    )
+      dispatch(listProducts())
+  }, [, createdProduct, product, createSuccess])
+
   useEffect(() => {
     if (!userInfo || !userInfo.isAdmin) navigate("/login")
-    if (!products || products.length === 0) dispatch(listProducts())
-  }, [userInfo])
+
+    if (createSuccess) {
+      if (formData.length === 0) {
+        resetReducers()
+        dispatch(listProducts())
+        navigate(`/admin/products/edit/${createdProduct}`)
+      } else {
+        dispatch(uploadProductImage(formData))
+      }
+    }
+    if (uploadSuccess) {
+      if (id) {
+        dispatch(listProducts())
+        resetReducers()
+      } else {
+        dispatch(listProducts())
+        navigate(`/admin/products/edit/${createdProduct}`)
+        resetReducers()
+      }
+    }
+  }, [
+    userInfo,
+    createSuccess,
+    formData,
+    createdProduct,
+    id,
+    product,
+    uploadSuccess,
+  ])
 
   useEffect(() => {
     if (id && products.length !== 0) {
@@ -98,6 +180,7 @@ const AdminProduct = ({ id }) => {
         }
         setDescription(productToEdit.description)
         setShowProduct(productToEdit.show)
+        setFormData([])
         if (productToEdit.images.length !== 0) {
           setImages(() => {
             const newImages = productToEdit.images.map(img => {
@@ -111,29 +194,45 @@ const AdminProduct = ({ id }) => {
     }
   }, [products, id])
 
-  const submitHandle = e => {
+  const submitHandle = async e => {
     e.preventDefault()
-    let formValid = true
-    images.map((imgObj, i) => {
-      if (!imgObj.local && !imgObj.blob && !imgObj.formData) {
-        const validateImg = new Image()
-        validateImg.src = imgObj.image
-        validateImg.onerror = () => {
-          console.log("error")
-          formValid = false
-          setFormError(true)
-          setImages(prevImages => {
-            prevImages[i].error =
-              "Image does not exist in give url! can't proceed"
-            return [...prevImages]
-          })
+    setFormError(false)
+    setValidationLoading(true)
+    let formData = []
+    const isFormValid = new Promise((resolve, reject) => {
+      images.map(async (imgObj, i) => {
+        if (imgObj.formData) {
+          formData.push(imgObj.formData)
+          if (i + 1 === images.length) resolve()
         }
-      }
+        if (!imgObj.local && !imgObj.blob && !imgObj.formData) {
+          const validateImg = new Image()
+          validateImg.src = imgObj.image
+          validateImg.onerror = () => {
+            setFormError(true)
+            setImages(prevImages => {
+              prevImages[i].error =
+                "Image does not exist in given url! can't proceed"
+              return [...prevImages]
+            })
+            reject()
+          }
+          validateImg.onload = () => {
+            if (i + 1 === images.length) resolve()
+          }
+        }
+      })
     })
-    if (formValid) {
-      setFormError(false)
-      console.log("xd321")
-    }
+    console.log(isFormValid)
+    // if
+    await isFormValid
+      .then(() => {
+        setFormError(false)
+        setValidationLoading(false)
+        if (formData.length !== 0) setFormData(formData)
+        dispatchCurrentProduct()
+      })
+      .catch(() => setValidationLoading(false))
   }
 
   return (
@@ -143,7 +242,7 @@ const AdminProduct = ({ id }) => {
           Go back
         </Button>
       </Link>
-      {loading ? (
+      {listProductsLoading ? (
         <Loader />
       ) : (
         <Grid
@@ -227,16 +326,20 @@ const AdminProduct = ({ id }) => {
                 {formError && (
                   <Alert severity="error">There's an error in your form!</Alert>
                 )}
+                {createError && <Alert severity="error">{createError}</Alert>}
+                {uploadError && <Alert severity="error">{uploadError}</Alert>}
                 <Button
                   type="submit"
                   variant="contained"
                   color="primary"
                   size="large"
                   style={{ marginTop: 15 }}
-                  // disabled={validateLoading}
+                  disabled={createLoading || uploadLoading || validationLoading}
                 >
                   Save
-                  {/* {validateLoading && <Loader button />} */}
+                  {(createLoading || uploadLoading || validationLoading) && (
+                    <Loader button />
+                  )}
                 </Button>
               </form>
             </Grid>

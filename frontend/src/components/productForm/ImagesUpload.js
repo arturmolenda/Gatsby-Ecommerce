@@ -88,30 +88,23 @@ const ImagesUpload = ({ images, setImages }) => {
     document.getElementById(`imageUpload-${i}`).click()
   }
 
-  const handleImageChange = async (e, i) => {
+  const handleImageChange = (e, i) => {
     const imageFile = e.target.files[0]
     if (imageFile) {
-      console.log("new img file")
       let fileType = imageFile.type.split("/")
       fileType = fileType[fileType.length - 1]
-      console.log(fileType)
       // check if is image
       if (!!fileType.match("jpg|jpeg|png|gif")) {
-        // Replace img name with projectId and proper extension type
         const blob = imageFile.slice(0, imageFile.size, imageFile.type)
-        const newFileName = await uuidv4()
-        const newFile = new File([blob], newFileName, {
+        const newFile = new File([blob], `${uuidv4()}.${fileType}`, {
           type: imageFile.type,
         })
-        console.log("new file", newFile)
         const imageDisplay = URL.createObjectURL(imageFile)
-        console.log("backgroundUpdate", imageDisplay)
 
         const imageFormData = new FormData()
-        imageFormData.append("img", newFile)
-
+        imageFormData.append("image", newFile)
         setImages(prevImages => {
-          prevImages[i].image = `${newFile.name}.${fileType}`
+          prevImages[i].image = newFile.name
           prevImages[i].blob = imageDisplay
           prevImages[i].formData = imageFormData
           prevImages[i].local = false
