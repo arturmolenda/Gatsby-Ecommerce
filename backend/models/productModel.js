@@ -34,7 +34,15 @@ const productSchema = mongoose.Schema(
     rating: { type: Number, required: true, default: 0 },
     numReviews: { type: Number, required: true, default: 0 },
     price: { type: Number, required: true },
-    discount: { type: Number, required: false },
+    discount: {
+      amount: { type: Number, required: false, default: 0 },
+      expireDate: {
+        type: Date,
+        required: false,
+        default: new Date().toISOString().substring(0, 10),
+      },
+      totalPrice: { type: Number, required: false, default: 0 },
+    },
     show: { type: Boolean, required: true, default: true },
     countInStock: { type: Number, required: true, default: 0 },
   },
