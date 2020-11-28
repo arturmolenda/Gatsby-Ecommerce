@@ -29,7 +29,7 @@ const getProducts = asyncHandler(async (req, res) => {
 // @route   GET /api/products/all
 // @access  Private/Admin
 const getAllProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find();
+  const products = await Product.find().sort({ createdAt: -1 });
   res.json(products);
 });
 
