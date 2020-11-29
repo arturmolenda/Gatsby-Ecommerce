@@ -2,9 +2,14 @@ import React, { useState, useEffect } from "react"
 import { navigate, Link } from "gatsby"
 
 import { useDispatch, useSelector } from "react-redux"
-import { getOrderDetails, payOrder } from "../../redux/actions/orderActions"
+import {
+  getOrderDetails,
+  payOrder,
+  shipOrder,
+} from "../../redux/actions/orderActions"
 
 import {
+  Button,
   Card,
   Container,
   Divider,
@@ -15,6 +20,7 @@ import {
   TableCell,
   TableContainer,
   TableRow,
+  TextField,
   Typography,
 } from "@material-ui/core"
 import Image from "../Image"
@@ -23,6 +29,7 @@ import { Alert } from "@material-ui/lab"
 import axios from "axios"
 import Loader from "../Loader"
 import { ORDER_PAY_RESET } from "../../redux/constants/orderConstants"
+import moment from "moment"
 
 const useStyles = makeStyles(theme => ({
   divideContainers: {
@@ -51,6 +58,7 @@ const useStyles = makeStyles(theme => ({
 
 const Order = ({ id: orderId }) => {
   const [sdkReady, setSdkReady] = useState(false)
+  const [tracking, setTracking] = useState("")
   const classes = useStyles()
   const dispatch = useDispatch()
   const { userInfo } = useSelector(state => state.userLogin)
@@ -60,11 +68,17 @@ const Order = ({ id: orderId }) => {
     shippingAddress: { address, city, postalCode, country },
     paymentMethod,
   } = useSelector(state => state.cart)
-  const { loading: loadingPay, success: successPay } = useSelector(
-    state => state.orderPay
-  )
+  const {
+    loading: loadingPay,
+    success: successPay,
+    error: errorPay,
+  } = useSelector(state => state.orderPay)
+  const {
+    loading: loadingShip,
+    success: successShip,
+    error: errorShip,
+  } = useSelector(state => state.orderShip)
 
-  // calculations and redirect
   useEffect(() => {
     if (!userInfo) navigate("/login")
     const addPayPalScript = async () => {
@@ -76,10 +90,10 @@ const Order = ({ id: orderId }) => {
       script.onload = () => setSdkReady(true)
       document.body.appendChild(script)
     }
-    if (!order || successPay || order._id !== orderId) {
+    if ((!order && !error) || successPay || (order && order._id !== orderId)) {
       dispatch(getOrderDetails(orderId))
       dispatch({ type: ORDER_PAY_RESET })
-    } else if (!order.isPaid) {
+    } else if (order && !order.isPaid) {
       if (!window.paypal) {
         addPayPalScript()
       } else {
@@ -88,8 +102,16 @@ const Order = ({ id: orderId }) => {
     }
   }, [userInfo, order, cartItems, successPay])
 
+  useEffect(() => {
+    if (successShip) dispatch(getOrderDetails(orderId))
+  }, [successShip])
+
   const successPaymentHandle = paymentResult => {
     dispatch(payOrder(orderId, paymentResult))
+  }
+
+  const markShipped = () => {
+    dispatch(shipOrder(orderId, tracking))
   }
 
   return loading ? (
@@ -132,9 +154,26 @@ const Order = ({ id: orderId }) => {
                 {country}
               </Typography>
               {order.shipped ? (
-                <Alert severity="info">
-                  Parcel shipped at {order.shippedAt}
-                </Alert>
+                <>
+                  <Alert severity="info">
+                    Parcel shipped at:{" "}
+                    <strong>{moment(order.shippedAt).format("LLL")}</strong>
+                    <br />
+                    {order.tracking && (
+                      <Typography variant="caption">
+                        You can track your order{" "}
+                        <a
+                          href={order.tracking}
+                          target="_blank"
+                          style={{ color: "#000", fontWeight: 600 }}
+                          className="underline"
+                        >
+                          here
+                        </a>
+                      </Typography>
+                    )}
+                  </Alert>
+                </>
               ) : (
                 <Alert severity="error">Not shipped</Alert>
               )}
@@ -146,7 +185,9 @@ const Order = ({ id: orderId }) => {
               <Divider style={{ marginBottom: 10 }} />
               <Typography variant="caption">{paymentMethod}</Typography>
               {order.isPaid ? (
-                <Alert severity="info">Paid at {order.paidAt}</Alert>
+                <Alert severity="info">
+                  Paid at: <strong>{moment(order.paidAt).format("LLL")}</strong>
+                </Alert>
               ) : (
                 <Alert severity="error">Not paid</Alert>
               )}
@@ -196,13 +237,46 @@ const Order = ({ id: orderId }) => {
             title={"ORDER SUMMARY"}
             price={order.price}
             totalPrice={order.totalPrice}
-            loading={loading}
+            loading={loading || loadingPay}
             couponInfo={order.coupon}
             payPalBtn
             isPaid={order.isPaid}
             sdkReady={sdkReady}
             btnHandle={successPaymentHandle}
           />
+          {errorPay && <Alert severity="error">{errorPay}</Alert>}
+          {userInfo.isAdmin && (
+            <Card style={{ marginTop: 20, padding: 10 }}>
+              <TextField
+                fullWidth
+                type="text"
+                variant="outlined"
+                label={
+                  order.shipped ? "Tracking Link" : "Tracking Link (optional)"
+                }
+                margin="dense"
+                value={tracking}
+                onChange={e => setTracking(e.target.value)}
+                style={{ marginBottom: 10 }}
+              />
+              <Button
+                fullWidth
+                color="primary"
+                variant="contained"
+                size="large"
+                onClick={markShipped}
+                disabled={loadingShip}
+              >
+                {order.shipped ? "UPDATE TRACKING" : "MARK AS SHIPPED"}
+                {loadingShip && <Loader button />}
+              </Button>
+              {errorShip && (
+                <Alert severity="error" style={{ marginTop: 10 }}>
+                  {errorShip}
+                </Alert>
+              )}
+            </Card>
+          )}
         </Grid>
       </Grid>
     </Container>
