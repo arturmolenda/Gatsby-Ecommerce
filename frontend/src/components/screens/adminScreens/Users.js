@@ -10,6 +10,7 @@ import {
 } from "../../../redux/actions/userActions"
 import {
   USER_DELETE_RESET,
+  USER_LIST_ALL_RESET,
   USER_UPDATE_ADMIN_RESET,
 } from "../../../redux/constants/userConstants"
 
@@ -70,7 +71,9 @@ const Users = () => {
 
   const dispatch = useDispatch()
   const { userInfo } = useSelector(state => state.userLogin)
-  const { loading, users, error } = useSelector(state => state.userListAll)
+  const { loading, users, success, error } = useSelector(
+    state => state.userListAll
+  )
   const {
     loading: updateLoading,
     success: updateSuccess,
@@ -89,12 +92,18 @@ const Users = () => {
 
   useEffect(() => {
     if (!userInfo || !userInfo.isAdmin) navigate("/login")
-    else if (!users || users.length === 0 || updateSuccess || deleteSuccess)
+    else if (
+      !users ||
+      (users.length === 0 && !success) ||
+      updateSuccess ||
+      deleteSuccess
+    )
       dispatch(listAllUsers())
   }, [userInfo, updateSuccess, deleteSuccess])
 
   useEffect(() => {
     return () => {
+      dispatch({ type: USER_LIST_ALL_RESET })
       resetAlerts()
     }
   }, [])

@@ -21,6 +21,7 @@ import {
   USER_DELETE_SUCCESS,
   USER_DELETE_FAIL,
   USER_DELETE_RESET,
+  USER_LIST_ALL_RESET,
 } from "../constants/userConstants"
 
 export const userLoginReducer = (state = {}, action) => {
@@ -76,6 +77,8 @@ export const userListAllReducer = (state = { users: [] }, action) => {
       return { loading: false, users: action.payload }
     case USER_LIST_ALL_FAIL:
       return { loading: false, error: action.payload }
+    case USER_LIST_ALL_RESET:
+      return {}
     default:
       return state
   }

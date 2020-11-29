@@ -109,9 +109,9 @@ const updateOrderToShipped = asyncHandler(async (req, res) => {
   if (order) {
     order.shipped = true;
     order.shippedAt = new Date().toISOString();
-    if (req.body.tracking) order.tracking = req.body.tracking;
+    order.tracking = req.body.tracking;
     await order.save();
-    res.json(updatedOrder);
+    res.json(order);
   } else {
     res.status(404);
     throw new Error('Order not found');
