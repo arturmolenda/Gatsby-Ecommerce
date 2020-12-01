@@ -9,9 +9,6 @@ const storage = multer.diskStorage({
     cb(null, path.join(__dirname, '/frontend/public/images'));
   },
   filename(req, file, cb) {
-    console.log(file);
-    console.log(req.body);
-    console.log(req.file);
     cb(null, file.originalname);
   },
 });
