@@ -4,7 +4,9 @@ import { Link, navigate } from "gatsby"
 import { useDispatch, useSelector } from "react-redux"
 import {
   createProduct,
+  getProductDetails,
   listProducts,
+  updateProduct,
   uploadProductImage,
 } from "../../../redux/actions/productActions"
 
@@ -67,6 +69,8 @@ const AdminProduct = ({ id }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
   const { userInfo } = useSelector(state => state.userLogin)
+  const { loading, product, error } = useSelector(state => state.productDetails)
+
   const {
     loading: listProductsLoading,
     products,
@@ -84,8 +88,13 @@ const AdminProduct = ({ id }) => {
     product: createdProduct,
     success: createSuccess,
   } = useSelector(state => state.productCreate)
+  const {
+    loading: updateLoading,
+    error: updateError,
+    success: updateSuccess,
+  } = useSelector(state => state.productUpdate)
 
-  const product = {
+  const previewProduct = {
     name,
     price,
     images,
@@ -97,24 +106,44 @@ const AdminProduct = ({ id }) => {
     labels,
     discount,
     category,
-    showProduct,
   }
 
-  const dispatchCurrentProduct = () =>
-    dispatch(
-      createProduct({
-        name,
-        price,
-        images,
-        brand,
-        countInStock: qty,
-        description,
-        labels,
-        discount,
-        category,
-        showProduct,
-      })
-    )
+  const dispatchCurrentProduct = () => {
+    if (id) {
+      dispatch(
+        updateProduct(
+          {
+            name,
+            price,
+            images,
+            brand,
+            countInStock: qty,
+            description,
+            labels,
+            discount,
+            category,
+            show: showProduct,
+          },
+          id
+        )
+      )
+    } else {
+      dispatch(
+        createProduct({
+          name,
+          price,
+          images,
+          brand,
+          countInStock: qty,
+          description,
+          labels,
+          discount,
+          category,
+          show: showProduct,
+        })
+      )
+    }
+  }
 
   const resetReducers = () => {
     dispatch({ type: PRODUCT_IMAGE_UPLOAD_RESET })
@@ -122,77 +151,69 @@ const AdminProduct = ({ id }) => {
   }
 
   useEffect(() => {
-    if (
-      !products ||
-      (products.length === 0 && !listProductsSuccess && !listProductsLoading)
-    )
+    if (!userInfo || !userInfo.isAdmin) navigate("/login")
+    if (id && !product && !createSuccess && !updateSuccess) {
+      dispatch(getProductDetails(id))
       dispatch(listProducts())
-  }, [, createdProduct, product, createSuccess])
+    } else if (product && id && product._id !== id)
+      dispatch(getProductDetails(id))
+  }, [userInfo, id, product])
 
   useEffect(() => {
-    if (!userInfo || !userInfo.isAdmin) navigate("/login")
-
-    if (createSuccess) {
+    if (createSuccess || updateSuccess) {
       if (formData.length === 0) {
         resetReducers()
-        dispatch(listProducts())
-        navigate(`/admin/products/edit/${createdProduct}`)
+        dispatch(getProductDetails(id))
+        if (!id) navigate(`/admin/products/edit/${createdProduct}`)
       } else {
         dispatch(uploadProductImage(formData))
+        resetReducers()
+        setFormData([])
       }
     }
     if (uploadSuccess) {
       if (id) {
-        dispatch(listProducts())
+        dispatch(getProductDetails(id))
         resetReducers()
       } else {
-        dispatch(listProducts())
         navigate(`/admin/products/edit/${createdProduct}`)
         resetReducers()
       }
     }
-  }, [
-    userInfo,
-    createSuccess,
-    formData,
-    createdProduct,
-    id,
-    product,
-    uploadSuccess,
-  ])
+  }, [createSuccess, updateSuccess, uploadSuccess])
 
   useEffect(() => {
-    if (id && products.length !== 0) {
-      const productToEdit = products.find(x => x._id === id)
-      if (productToEdit) {
-        setName(productToEdit.name)
-        setPrice(productToEdit.price)
-        setLabels(productToEdit.labels)
-        setCategory(productToEdit.category)
-        setQty(productToEdit.countInStock)
-        setBrand(productToEdit.brand)
-        if (
-          productToEdit.discount &&
-          productToEdit.discount.amount &&
-          productToEdit.discount.expireDate
-        ) {
-          setDiscount(productToEdit.discount)
-        }
-        setDescription(productToEdit.description)
-        setShowProduct(productToEdit.show)
-        setFormData([])
-        if (productToEdit.images.length !== 0) {
-          setImages(() => {
-            const newImages = productToEdit.images.map(img => {
-              img.local = true
-              return img
-            })
-            return newImages
+    if (id && product && product._id === id) {
+      setName(product.name)
+      setPrice(product.price)
+      setLabels(product.labels)
+      setCategory(product.category)
+      setQty(product.countInStock)
+      setBrand(product.brand)
+      if (
+        product.discount &&
+        product.discount.amount &&
+        product.discount.expireDate
+      ) {
+        setDiscount({
+          ...product.discount,
+          expireDate: product.discount.expireDate.substring(0, 10),
+        })
+      }
+      setDescription(product.description)
+      setShowProduct(product.show)
+      setFormData([])
+      if (product.images.length !== 0) {
+        setImages(() => {
+          const newImages = product.images.map(img => {
+            img.local = true
+            return img
           })
-        }
+          return newImages
+        })
       }
     }
-  }, [products, id])
+  }, [product, id])
 
   const submitHandle = async e => {
     e.preventDefault()
@@ -220,11 +241,11 @@ const AdminProduct = ({ id }) => {
           validateImg.onload = () => {
             if (i + 1 === images.length) resolve()
           }
+        } else if (imgObj.local) {
+          if (i + 1 === images.length) resolve()
         }
       })
     })
-    console.log(isFormValid)
-    // if
     await isFormValid
       .then(() => {
         setFormError(false)
@@ -242,8 +263,10 @@ const AdminProduct = ({ id }) => {
           Go back
         </Button>
       </Link>
-      {listProductsLoading ? (
+      {listProductsLoading || loading ? (
         <Loader />
+      ) : error ? (
+        <Alert severity="error">{error}</Alert>
       ) : (
         <Grid
           container
@@ -260,7 +283,7 @@ const AdminProduct = ({ id }) => {
             >
               PRODUCT PAGE PREVIEW
             </Typography>
-            <Product previewProduct={product} />
+            <Product previewProduct={previewProduct} />
           </Grid>
 
           <Grid
@@ -284,7 +307,7 @@ const AdminProduct = ({ id }) => {
               </Grid>
             )}
             <Grid item xs={6} sm={4} md={3}>
-              <ProductCard product={product} disableLink />
+              <ProductCard product={previewProduct} disableLink />
             </Grid>
             {products.length !== 0 && (
               <Grid item xs={6} sm={4} md={3} className={classes.sampleProduct}>
@@ -328,18 +351,25 @@ const AdminProduct = ({ id }) => {
                 )}
                 {createError && <Alert severity="error">{createError}</Alert>}
                 {uploadError && <Alert severity="error">{uploadError}</Alert>}
+                {updateError && <Alert severity="error">{updateError}</Alert>}
                 <Button
                   type="submit"
                   variant="contained"
                   color="primary"
                   size="large"
                   style={{ marginTop: 15 }}
-                  disabled={createLoading || uploadLoading || validationLoading}
+                  disabled={
+                    createLoading ||
+                    uploadLoading ||
+                    validationLoading ||
+                    updateLoading
+                  }
                 >
                   Save
-                  {(createLoading || uploadLoading || validationLoading) && (
-                    <Loader button />
-                  )}
+                  {(createLoading ||
+                    uploadLoading ||
+                    validationLoading ||
+                    updateLoading) && <Loader button />}
                 </Button>
               </form>
             </Grid>
