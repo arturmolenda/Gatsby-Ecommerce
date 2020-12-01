@@ -47,7 +47,10 @@ export const createOrder = order => async (dispatch, getState) => {
       type: ORDER_CREATE_SUCCESS,
       payload: data,
     })
-    setTimeout(() => dispatch({ type: CART_DELETE_ITEMS }), 1000)
+    setTimeout(() => {
+      localStorage.removeItem("cartItems")
+      dispatch({ type: CART_DELETE_ITEMS })
+    }, 1000)
   } catch (error) {
     dispatch({
       type: ORDER_CREATE_FAIL,
