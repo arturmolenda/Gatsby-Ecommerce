@@ -23,7 +23,14 @@ import {
   productImageUploadReducer,
 } from "./reducers/productReducers"
 import { cartReducer } from "./reducers/cartReducers"
-import { discountApplyReducer } from "./reducers/discountReducers"
+import {
+  discountApplyReducer,
+  discountListAllReducer,
+  discountCreateReducer,
+  discountUpdateReducer,
+  discountDeleteReducer,
+  discountDetailsReducer,
+} from "./reducers/discountReducers"
 import {
   orderCreateReducer,
   orderDetailsReducer,
@@ -47,6 +54,11 @@ const reducer = combineReducers({
   productImageUpload: productImageUploadReducer,
   cart: cartReducer,
   discountApply: discountApplyReducer,
+  discountListAll: discountListAllReducer,
+  discountCreate: discountCreateReducer,
+  discountUpdate: discountUpdateReducer,
+  discountDelete: discountDeleteReducer,
+  discountDetails: discountDetailsReducer,
   orderCreate: orderCreateReducer,
   orderDetails: orderDetailsReducer,
   orderListMy: orderListMyReducer,
