@@ -14,6 +14,19 @@ import {
   ORDER_PAY_SUCCESS,
   ORDER_PAY_FAIL,
   ORDER_PAY_RESET,
+  ORDER_LIST_ALL_REQUEST,
+  ORDER_LIST_ALL_SUCCESS,
+  ORDER_LIST_ALL_FAIL,
+  ORDER_LIST_ALL_RESET,
+  ORDER_SHIP_REQUEST,
+  ORDER_SHIP_SUCCESS,
+  ORDER_SHIP_FAIL,
+  ORDER_SHIP_RESET,
+  ORDER_DELETE_REQUEST,
+  ORDER_DELETE_SUCCESS,
+  ORDER_DELETE_FAIL,
+  ORDER_DELETE_RESET,
+  ORDER_DETAILS_RESET,
 } from "../constants/orderConstants"
 
 export const orderCreateReducer = (state = {}, action) => {
@@ -47,6 +60,8 @@ export const orderDetailsReducer = (
       return { loading: false, order: action.payload }
     case ORDER_DETAILS_FAIL:
       return { loading: false, error: action.payload }
+    case ORDER_DETAILS_RESET:
+      return { loading: true, order: {} }
     default:
       return state
   }
@@ -78,6 +93,53 @@ export const orderPayReducer = (state = {}, action) => {
     case ORDER_PAY_FAIL:
       return { loading: false, error: action.payload }
     case ORDER_PAY_RESET:
+      return {}
+    default:
+      return state
+  }
+}
+
+export const orderListAllReducer = (state = { orders: [] }, action) => {
+  switch (action.type) {
+    case ORDER_LIST_ALL_REQUEST:
+      return {
+        loading: true,
+      }
+    case ORDER_LIST_ALL_SUCCESS:
+      return { loading: false, success: true, orders: action.payload }
+    case ORDER_LIST_ALL_FAIL:
+      return { loading: false, error: action.payload }
+    case ORDER_LIST_ALL_RESET:
+      return {}
+    default:
+      return state
+  }
+}
+
+export const orderShipReducer = (state = {}, action) => {
+  switch (action.type) {
+    case ORDER_SHIP_REQUEST:
+      return { loading: true }
+    case ORDER_SHIP_SUCCESS:
+      return { loading: false, success: true }
+    case ORDER_SHIP_FAIL:
+      return { loading: false, error: action.payload }
+    case ORDER_SHIP_RESET:
+      return {}
+    default:
+      return state
+  }
+}
+
+export const orderDeleteReducer = (state = {}, action) => {
+  switch (action.type) {
+    case ORDER_DELETE_REQUEST:
+      return { loading: action.payload }
+    case ORDER_DELETE_SUCCESS:
+      return { loading: false, success: true }
+    case ORDER_DELETE_FAIL:
+      return { loading: false, error: action.payload }
+    case ORDER_DELETE_RESET:
       return {}
     default:
       return state

@@ -2,9 +2,18 @@ import React, { useState, useEffect } from "react"
 import { navigate, Link } from "gatsby"
 
 import { useDispatch, useSelector } from "react-redux"
-import { getOrderDetails, payOrder } from "../../redux/actions/orderActions"
+import {
+  getOrderDetails,
+  payOrder,
+  shipOrder,
+} from "../../redux/actions/orderActions"
+import {
+  ORDER_DETAILS_RESET,
+  ORDER_PAY_RESET,
+} from "../../redux/constants/orderConstants"
 
 import {
+  Button,
   Card,
   Container,
   Divider,
@@ -15,6 +24,7 @@ import {
   TableCell,
   TableContainer,
   TableRow,
+  TextField,
   Typography,
 } from "@material-ui/core"
 import Image from "../Image"
@@ -22,7 +32,8 @@ import PaymentCard from "../PaymentCard"
 import { Alert } from "@material-ui/lab"
 import axios from "axios"
 import Loader from "../Loader"
-import { ORDER_PAY_RESET } from "../../redux/constants/orderConstants"
+
+import moment from "moment"
 
 const useStyles = makeStyles(theme => ({
   divideContainers: {
@@ -51,6 +62,7 @@ const useStyles = makeStyles(theme => ({
 
 const Order = ({ id: orderId }) => {
   const [sdkReady, setSdkReady] = useState(false)
+  const [tracking, setTracking] = useState("")
   const classes = useStyles()
   const dispatch = useDispatch()
   const { userInfo } = useSelector(state => state.userLogin)
@@ -60,11 +72,17 @@ const Order = ({ id: orderId }) => {
     shippingAddress: { address, city, postalCode, country },
     paymentMethod,
   } = useSelector(state => state.cart)
-  const { loading: loadingPay, success: successPay } = useSelector(
-    state => state.orderPay
-  )
+  const {
+    loading: loadingPay,
+    success: successPay,
+    error: errorPay,
+  } = useSelector(state => state.orderPay)
+  const {
+    loading: loadingShip,
+    success: successShip,
+    error: errorShip,
+  } = useSelector(state => state.orderShip)
 
-  // calculations and redirect
   useEffect(() => {
     if (!userInfo) navigate("/login")
     const addPayPalScript = async () => {
@@ -77,8 +95,8 @@ const Order = ({ id: orderId }) => {
       document.body.appendChild(script)
     }
     if (!order || successPay || order._id !== orderId) {
-      dispatch(getOrderDetails(orderId))
       dispatch({ type: ORDER_PAY_RESET })
+      dispatch(getOrderDetails(orderId))
     } else if (!order.isPaid) {
       if (!window.paypal) {
         addPayPalScript()
@@ -86,126 +104,201 @@ const Order = ({ id: orderId }) => {
         setSdkReady(true)
       }
     }
-  }, [userInfo, order, cartItems, successPay])
+  }, [userInfo, order, successPay])
+
+  useEffect(() => {
+    if (successShip) dispatch(getOrderDetails(orderId))
+    console.log(successPay)
+  }, [successShip])
+
+  useEffect(() => {
+    return () => {
+      dispatch({ type: ORDER_PAY_RESET })
+      dispatch({ type: ORDER_DETAILS_RESET })
+    }
+  }, [])
 
   const successPaymentHandle = paymentResult => {
     dispatch(payOrder(orderId, paymentResult))
   }
 
-  return loading ? (
-    <Loader />
-  ) : error ? (
-    <Alert severity="error">{error}</Alert>
-  ) : (
-    <Container className={classes.orderContainer}>
-      <Typography variant="h1" style={{ fontSize: "1.9rem" }}>
-        ORDER {orderId}
-      </Typography>
-      {error && <Alert severity="error">{error}</Alert>}
-      <Grid container spacing={2} style={{ marginTop: 30 }}>
-        <Grid item md={8} sm={12} xs={12}>
-          <Card style={{ padding: "23.5px 10px" }}>
-            <div className={classes.divideContainers}>
-              <Typography className={classes.textHeader} variant="h2">
-                SHIPPING
-              </Typography>
-              <Divider style={{ marginBottom: 10 }} />
-              <Typography variant="caption" component="div">
-                <strong>Name:</strong> {order.user.name}
-              </Typography>
-              <Typography variant="caption" component="div">
-                <strong>Email:</strong> {order.user.email}
-              </Typography>
-              <Typography variant="caption" component="div">
-                <strong>Address:</strong>
-              </Typography>
-              <Typography variant="caption" component="div">
-                {address}
-              </Typography>
-              <Typography variant="caption" component="div">
-                {city}
-              </Typography>
-              <Typography variant="caption" component="div">
-                {postalCode}
-              </Typography>
-              <Typography variant="caption" component="div">
-                {country}
-              </Typography>
-              {order.shipped ? (
-                <Alert severity="info">
-                  Parcel shipped at {order.shippedAt}
-                </Alert>
-              ) : (
-                <Alert severity="error">Not shipped</Alert>
+  const markShipped = () => {
+    dispatch(shipOrder(orderId, tracking))
+  }
+
+  return (
+    <>
+      {loading ? (
+        <Loader />
+      ) : error ? (
+        <Alert severity="error">{error}</Alert>
+      ) : (
+        <Container className={classes.orderContainer}>
+          <Typography variant="h1" style={{ fontSize: "1.9rem" }}>
+            ORDER {orderId}
+          </Typography>
+          {error && <Alert severity="error">{error}</Alert>}
+          <Grid container spacing={2} style={{ marginTop: 30 }}>
+            <Grid item md={8} sm={12} xs={12}>
+              <Card style={{ padding: "23.5px 10px" }}>
+                <div className={classes.divideContainers}>
+                  <Typography className={classes.textHeader} variant="h2">
+                    SHIPPING
+                  </Typography>
+                  <Divider style={{ marginBottom: 10 }} />
+                  <Typography variant="caption" component="div">
+                    <strong>Name:</strong> {order.user.name}
+                  </Typography>
+                  <Typography variant="caption" component="div">
+                    <strong>Email:</strong> {order.user.email}
+                  </Typography>
+                  <Typography variant="caption" component="div">
+                    <strong>Address:</strong>
+                  </Typography>
+                  <Typography variant="caption" component="div">
+                    {address}
+                  </Typography>
+                  <Typography variant="caption" component="div">
+                    {city}
+                  </Typography>
+                  <Typography variant="caption" component="div">
+                    {postalCode}
+                  </Typography>
+                  <Typography variant="caption" component="div">
+                    {country}
+                  </Typography>
+                  {order.shipped ? (
+                    <>
+                      <Alert severity="info">
+                        Parcel shipped at:{" "}
+                        <strong>{moment(order.shippedAt).format("LLL")}</strong>
+                        <br />
+                        {order.tracking && (
+                          <Typography variant="caption">
+                            You can track your order{" "}
+                            <a
+                              href={order.tracking}
+                              target="_blank"
+                              style={{ color: "#000", fontWeight: 600 }}
+                              className="underline"
+                            >
+                              here
+                            </a>
+                          </Typography>
+                        )}
+                      </Alert>
+                    </>
+                  ) : (
+                    <Alert severity="error">Not shipped</Alert>
+                  )}
+                </div>
+                <div className={classes.divideContainers}>
+                  <Typography className={classes.textHeader} variant="h2">
+                    PAYMENT METHOD
+                  </Typography>
+                  <Divider style={{ marginBottom: 10 }} />
+                  <Typography variant="caption">{paymentMethod}</Typography>
+                  {order.isPaid ? (
+                    <Alert severity="info">
+                      Paid at:{" "}
+                      <strong>{moment(order.paidAt).format("LLL")}</strong>
+                    </Alert>
+                  ) : (
+                    <Alert severity="error">Not paid</Alert>
+                  )}
+                </div>
+                <div>
+                  <Typography className={classes.textHeader} variant="h2">
+                    ORDER
+                  </Typography>
+                  <Divider style={{ marginBottom: 10 }} />
+                  <TableContainer>
+                    <Table>
+                      <TableBody>
+                        {order.orderItems.map(item => (
+                          <TableRow key={item.product}>
+                            <TableCell style={{ width: 100, padding: 8 }}>
+                              <Link
+                                to={`/product/${item.product}?backLink=order/${orderId}`}
+                              >
+                                <Image
+                                  alt={item.name}
+                                  filename={item.image}
+                                  customStyle={{ borderRadius: 6 }}
+                                />
+                              </Link>
+                            </TableCell>
+                            <TableCell>
+                              <Link
+                                className="underline"
+                                to={`/product/${item.product}?backLink=order/${orderId}`}
+                              >
+                                {item.name}
+                              </Link>
+                            </TableCell>
+                            <TableCell align="right">
+                              {item.qty} x ${item.price}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </div>
+              </Card>
+            </Grid>
+            <Grid item md={4} sm={12} xs={12}>
+              <PaymentCard
+                title={"ORDER SUMMARY"}
+                price={order.price}
+                totalPrice={order.totalPrice}
+                loading={loading || loadingPay}
+                couponInfo={order.coupon}
+                payPalBtn={!order.isPaid || !successPay}
+                isPaid={order.isPaid}
+                sdkReady={sdkReady}
+                btnHandle={successPaymentHandle}
+              />
+              {errorPay && <Alert severity="error">{errorPay}</Alert>}
+              {userInfo && userInfo.isAdmin && (
+                <Card style={{ marginTop: 20, padding: 10 }}>
+                  <TextField
+                    fullWidth
+                    type="text"
+                    variant="outlined"
+                    label={
+                      order.shipped
+                        ? "Tracking Link"
+                        : "Tracking Link (optional)"
+                    }
+                    margin="dense"
+                    value={tracking}
+                    onChange={e => setTracking(e.target.value)}
+                    style={{ marginBottom: 10 }}
+                  />
+                  <Button
+                    fullWidth
+                    color="primary"
+                    variant="contained"
+                    size="large"
+                    onClick={markShipped}
+                    disabled={loadingShip}
+                  >
+                    {order.shipped ? "UPDATE TRACKING" : "MARK AS SHIPPED"}
+                    {loadingShip && <Loader button />}
+                  </Button>
+                  {errorShip && (
+                    <Alert severity="error" style={{ marginTop: 10 }}>
+                      {errorShip}
+                    </Alert>
+                  )}
+                </Card>
               )}
-            </div>
-            <div className={classes.divideContainers}>
-              <Typography className={classes.textHeader} variant="h2">
-                PAYMENT METHOD
-              </Typography>
-              <Divider style={{ marginBottom: 10 }} />
-              <Typography variant="caption">{paymentMethod}</Typography>
-              {order.isPaid ? (
-                <Alert severity="info">Paid at {order.paidAt}</Alert>
-              ) : (
-                <Alert severity="error">Not paid</Alert>
-              )}
-            </div>
-            <div>
-              <Typography className={classes.textHeader} variant="h2">
-                ORDER
-              </Typography>
-              <Divider style={{ marginBottom: 10 }} />
-              <TableContainer>
-                <Table>
-                  <TableBody>
-                    {order.orderItems.map(item => (
-                      <TableRow key={item.product}>
-                        <TableCell style={{ width: 100, padding: 8 }}>
-                          <Link
-                            to={`/product/${item.product}?backLink=order/${orderId}`}
-                          >
-                            <Image
-                              alt={item.name}
-                              filename={item.image}
-                              customStyle={{ borderRadius: 6 }}
-                            />
-                          </Link>
-                        </TableCell>
-                        <TableCell>
-                          <Link
-                            className="underline"
-                            to={`/product/${item.product}?backLink=order/${orderId}`}
-                          >
-                            {item.name}
-                          </Link>
-                        </TableCell>
-                        <TableCell align="right">
-                          {item.qty} x ${item.price}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </div>
-          </Card>
-        </Grid>
-        <Grid item md={4} sm={12} xs={12}>
-          <PaymentCard
-            title={"ORDER SUMMARY"}
-            price={order.price}
-            totalPrice={order.totalPrice}
-            loading={loading}
-            couponInfo={order.coupon}
-            payPalBtn
-            isPaid={order.isPaid}
-            sdkReady={sdkReady}
-            btnHandle={successPaymentHandle}
-          />
-        </Grid>
-      </Grid>
-    </Container>
+            </Grid>
+          </Grid>
+        </Container>
+      )}
+    </>
   )
 }
 

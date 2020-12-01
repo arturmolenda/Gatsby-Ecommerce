@@ -73,7 +73,9 @@ const getOrderById = asyncHandler(async (req, res) => {
 // @route   GET /api/orders/myorders
 // @access  Private
 const getMyOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find({ 'user._id': req.user._id });
+  const orders = await Order.find({ 'user._id': req.user._id }).sort({
+    createdAt: -1,
+  });
   res.json(orders);
 });
 
@@ -91,12 +93,58 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
       update_time: req.body.update_time,
       email_address: req.body.payer.email_address,
     };
-    const updatedOrder = await order.save();
-    res.json(updatedOrder);
+    await order.save();
+    res.json(order);
   } else {
     res.status(404);
     throw new Error('Order not found');
   }
 });
 
-export { createOrder, getOrderById, getMyOrders, updateOrderToPaid };
+// @desc    Update order to shipped
+// @route   PUT /api/orders/:id/ship
+// @access  Private/Admin
+const updateOrderToShipped = asyncHandler(async (req, res) => {
+  const order = await Order.findById(req.params.id);
+  if (order) {
+    order.shipped = true;
+    order.shippedAt = new Date().toISOString();
+    order.tracking = req.body.tracking;
+    await order.save();
+    res.json(order);
+  } else {
+    res.status(404);
+    throw new Error('Order not found');
+  }
+});
+
+// @desc    Get all orders
+// @route   GET /api/orders/all
+// @access  Private/Admin
+const getAllOrders = asyncHandler(async (req, res) => {
+  const orders = await Order.find().sort({ createdAt: -1 });
+  res.json(orders);
+});
+
+// @desc    Delete order
+// @route   DELETE /api/orders/:id
+// @access  Private/Admin
+const deleteOrder = asyncHandler(async (req, res) => {
+  const order = await Order.findOneAndDelete({ _id: req.params.id });
+  if (order) {
+    res.json({ message: 'Order deleted' });
+  } else {
+    res.status(404);
+    throw new Error('Order not found');
+  }
+});
+
+export {
+  createOrder,
+  getOrderById,
+  getMyOrders,
+  updateOrderToPaid,
+  updateOrderToShipped,
+  getAllOrders,
+  deleteOrder,
+};

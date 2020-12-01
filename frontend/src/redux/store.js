@@ -23,12 +23,22 @@ import {
   productImageUploadReducer,
 } from "./reducers/productReducers"
 import { cartReducer } from "./reducers/cartReducers"
-import { discountApplyReducer } from "./reducers/discountReducers"
+import {
+  discountApplyReducer,
+  discountListAllReducer,
+  discountCreateReducer,
+  discountUpdateReducer,
+  discountDeleteReducer,
+  discountDetailsReducer,
+} from "./reducers/discountReducers"
 import {
   orderCreateReducer,
   orderDetailsReducer,
   orderListMyReducer,
   orderPayReducer,
+  orderListAllReducer,
+  orderShipReducer,
+  orderDeleteReducer,
 } from "./reducers/orderReducers"
 const reducer = combineReducers({
   userLogin: userLoginReducer,
@@ -44,10 +54,18 @@ const reducer = combineReducers({
   productImageUpload: productImageUploadReducer,
   cart: cartReducer,
   discountApply: discountApplyReducer,
+  discountListAll: discountListAllReducer,
+  discountCreate: discountCreateReducer,
+  discountUpdate: discountUpdateReducer,
+  discountDelete: discountDeleteReducer,
+  discountDetails: discountDetailsReducer,
   orderCreate: orderCreateReducer,
   orderDetails: orderDetailsReducer,
   orderListMy: orderListMyReducer,
   orderPay: orderPayReducer,
+  orderListAll: orderListAllReducer,
+  orderShip: orderShipReducer,
+  orderDelete: orderDeleteReducer,
 })
 
 let userInfoFromStorage,

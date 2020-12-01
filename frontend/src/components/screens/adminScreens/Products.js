@@ -6,7 +6,10 @@ import {
   deleteProduct,
   listAllProducts,
 } from "../../../redux/actions/productActions"
-import { PRODUCT_DELETE_RESET } from "../../../redux/constants/productConstants"
+import {
+  PRODUCT_DELETE_RESET,
+  PRODUCT_LIST_ALL_RESET,
+} from "../../../redux/constants/productConstants"
 
 import {
   Button,
@@ -55,7 +58,7 @@ const Products = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
   const { userInfo } = useSelector(state => state.userLogin)
-  const { loading, products, error } = useSelector(
+  const { loading, products, success, error } = useSelector(
     state => state.productListAll
   )
   const {
@@ -68,13 +71,18 @@ const Products = () => {
 
   useEffect(() => {
     if (!userInfo || !userInfo.isAdmin) navigate("/login")
-    else if (!products || products.length === 0 || deleteSuccess) {
+    else if (
+      !products ||
+      (products.length === 0 && !success) ||
+      deleteSuccess
+    ) {
       dispatch(listAllProducts())
     }
   }, [userInfo, deleteSuccess])
 
   useEffect(() => {
     return () => {
+      dispatch({ type: PRODUCT_LIST_ALL_RESET })
       resetDeleteAlert()
     }
   }, [])

@@ -26,7 +26,7 @@ const Shipping = ({ location }) => {
     console.log(userInfo, cartItems)
     if (!userInfo) navigate("/")
     else if (cartItems.length === 0) navigate("/cart")
-    if (shippingAddress) {
+    if (shippingAddress && Object.keys(shippingAddress).length === 4) {
       setAddress(shippingAddress.address)
       setCity(shippingAddress.city)
       setPostalCode(shippingAddress.postalCode)

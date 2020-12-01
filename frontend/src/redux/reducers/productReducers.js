@@ -14,6 +14,7 @@ import {
   PRODUCT_LIST_ALL_FAIL,
   PRODUCT_LIST_ALL_REQUEST,
   PRODUCT_LIST_ALL_SUCCESS,
+  PRODUCT_LIST_ALL_RESET,
   PRODUCT_LIST_FAIL,
   PRODUCT_LIST_REQUEST,
   PRODUCT_LIST_SUCCESS,
@@ -43,6 +44,8 @@ export const productListAllReducer = (
       return { loading: false, products: action.payload, success: true }
     case PRODUCT_LIST_ALL_FAIL:
       return { loading: false, error: action.payload }
+    case PRODUCT_LIST_ALL_RESET:
+      return {}
     default:
       return state
   }
