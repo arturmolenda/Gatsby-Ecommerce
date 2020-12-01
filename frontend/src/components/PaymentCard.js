@@ -88,7 +88,7 @@ const PaymentCard = ({
         </Table>
         <div
           style={{
-            padding: sdkReady ? "10px 10px 0" : isPaid ? 0 : 10,
+            padding: isPaid ? 0 : sdkReady ? "10px 10px 0" : 10,
             position: "relative",
           }}
         >
