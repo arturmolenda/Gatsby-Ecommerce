@@ -25,7 +25,6 @@ const Image = props => {
         }
       `}
       render={data => {
-        console.log(data.images)
         const image = data.images.edges.find(n => {
           return n.node.relativePath.includes(props.filename)
         })
@@ -40,7 +39,11 @@ const Image = props => {
 
               return (
                 <ReactImage
-                  style={{ width: "100%" }}
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    ...props.customStyle,
+                  }}
                   alt={props.alt}
                   src={src}
                   loader={
@@ -71,7 +74,6 @@ const Image = props => {
             return null
           }
         }
-        console.log(image)
         return (
           <Img
             alt={props.alt}
