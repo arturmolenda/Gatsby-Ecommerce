@@ -7,7 +7,7 @@ import fetch from 'node-fetch';
 import { v4 as uuidv4 } from 'uuid';
 
 // @desc    Get products
-// @route   GET /api/products?id=
+// @route   GET /api/products?id=&pageNumber=&keyword=
 // @access  Public
 const getProducts = asyncHandler(async (req, res) => {
   const id = req.query.id;
@@ -20,8 +20,18 @@ const getProducts = asyncHandler(async (req, res) => {
       throw new Error('Product not found');
     }
   } else {
-    const products = await Product.find({ show: true });
-    res.json(products);
+    const pageSize = 10;
+    const page = Number(req.query.pageNumber) || 1;
+    const keyword = req.query.keyword
+      ? { name: { $regex: req.query.keyword, $options: 'i' } }
+      : {};
+    console.log(keyword);
+    const count = await Product.countDocuments({ show: true, ...keyword });
+    console.log(count);
+    const products = await Product.find({ show: true, ...keyword })
+      .limit(pageSize)
+      .skip(pageSize * (page - 1));
+    res.json({ products, page, pages: Math.ceil(count / pageSize) });
   }
 });
 
