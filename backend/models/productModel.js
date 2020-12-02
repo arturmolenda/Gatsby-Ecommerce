@@ -24,6 +24,11 @@ const imageSchema = mongoose.Schema({
 const productSchema = mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
+    lastEditedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: false,
+      ref: 'User',
+    },
     name: { type: String, required: true },
     brand: { type: String, required: true },
     category: { type: String, required: true },

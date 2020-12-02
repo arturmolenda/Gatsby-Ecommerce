@@ -56,11 +56,13 @@ const ProductForm = ({
   const updatePrice = e => {
     priceChange(e)
     if (discount.amount > 0) {
+      e.persist()
       setDiscount(prevState => {
         prevState.totalPrice = (
           parseFloat(e.target.value) -
           (parseFloat(e.target.value) * (discount.amount / 100)).toFixed(2)
         ).toFixed(2)
+        return { ...prevState }
       })
     }
   }

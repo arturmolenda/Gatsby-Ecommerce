@@ -1,29 +1,51 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect } from "react"
+import { Link, navigate } from "gatsby"
 
 import { useDispatch, useSelector } from "react-redux"
 import { listProducts } from "../../redux/actions/productActions"
 
-import { Grid, Typography } from "@material-ui/core"
-import { Alert } from "@material-ui/lab"
+import { Button, Grid, Typography } from "@material-ui/core"
+import { Alert, Pagination } from "@material-ui/lab"
+import ArrowBackIcon from "@material-ui/icons/ArrowBack"
 import ProductCard from "./ProductCard"
-import Loader from "../Loader"
 import ProductSkeleton from "../ProductSkeleton"
-const Products = () => {
+const Products = props => {
   const dispatch = useDispatch()
-  const { loading, error, products, success } = useSelector(
-    state => state.productList
-  )
+  const {
+    loading,
+    error,
+    products,
+    page: currentPage,
+    pages,
+    success,
+  } = useSelector(state => state.productList)
+
+  const keyword = props.keyword
+  const page = props.pageNumber
+
   useEffect(() => {
-    if (products.length === 0 && !success) {
-      dispatch(listProducts())
-    }
-  }, [dispatch, success])
+    dispatch(listProducts(page, keyword))
+  }, [dispatch, page, keyword])
+
+  const pageChangeHandle = (e, pageNum) => {
+    if (keyword) navigate(`/search/${keyword}/page/${pageNum}`)
+    else navigate(`/page/${pageNum}`)
+  }
   return (
     <>
-      <Typography variant="h1">LATEST PRODUCTS</Typography>
+      {keyword && (
+        <Link to={"/"}>
+          <Button startIcon={<ArrowBackIcon />} style={{ marginBottom: 10 }}>
+            Go back
+          </Button>
+        </Link>
+      )}
+      <Typography variant="h1">
+        {keyword ? "SHOWING SEARCH RESULTS" : "LATEST PRODUCTS"}
+      </Typography>
       {loading ? (
         <Grid container spacing={3}>
-          {[...Array(20).keys()].map(num => (
+          {[...Array(10).keys()].map(num => (
             <Grid item xs={6} sm={4} md={3} key={num}>
               <ProductSkeleton />
             </Grid>
@@ -32,14 +54,24 @@ const Products = () => {
       ) : error ? (
         <Alert severity="error">{error}</Alert>
       ) : (
-        <Grid container spacing={3}>
-          {products.length !== 0 &&
-            products.map(product => (
-              <Grid item xs={6} sm={4} md={3} key={product._id}>
-                <ProductCard key={product._id} product={product} />
-              </Grid>
-            ))}
-        </Grid>
+        <>
+          <Grid container spacing={3}>
+            {products.length !== 0 &&
+              products.map(product => (
+                <Grid item xs={6} sm={4} md={3} key={product._id}>
+                  <ProductCard key={product._id} product={product} />
+                </Grid>
+              ))}
+          </Grid>
+          {pages > 1 && (
+            <Pagination
+              count={pages}
+              page={currentPage}
+              onChange={pageChangeHandle}
+              style={{ marginTop: 20 }}
+            />
+          )}
+        </>
       )}
     </>
   )

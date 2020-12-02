@@ -7,7 +7,7 @@ import fetch from 'node-fetch';
 import { v4 as uuidv4 } from 'uuid';
 
 // @desc    Get products
-// @route   GET /api/products?id=
+// @route   GET /api/products?id=&pageNumber=&keyword=
 // @access  Public
 const getProducts = asyncHandler(async (req, res) => {
   const id = req.query.id;
@@ -20,8 +20,18 @@ const getProducts = asyncHandler(async (req, res) => {
       throw new Error('Product not found');
     }
   } else {
-    const products = await Product.find({ show: true });
-    res.json(products);
+    const pageSize = 10;
+    const page = Number(req.query.pageNumber) || 1;
+    const keyword = req.query.keyword
+      ? { name: { $regex: req.query.keyword, $options: 'i' } }
+      : {};
+    console.log(keyword);
+    const count = await Product.countDocuments({ show: true, ...keyword });
+    console.log(count);
+    const products = await Product.find({ show: true, ...keyword })
+      .limit(pageSize)
+      .skip(pageSize * (page - 1));
+    res.json({ products, page, pages: Math.ceil(count / pageSize) });
   }
 });
 
@@ -45,7 +55,11 @@ const deleteProduct = asyncHandler(async (req, res) => {
         fs.unlink(
           path.join(__dirname, `/frontend/public/images/${img.image}`),
           (err) => {
-            if (err) console.error(err);
+            if (err) {
+              console.error(err);
+              res.json(500);
+              throw new Error('Deleting product failed');
+            }
           }
         );
       });
@@ -124,4 +138,84 @@ const createProduct = asyncHandler(async (req, res) => {
     });
 });
 
-export { getProducts, getAllProducts, deleteProduct, createProduct };
+// @desc    Edit product
+// @route   PUT /api/products/:id
+// @access  Private/Admin
+const editProduct = asyncHandler(async (req, res) => {
+  const {
+    name,
+    brand,
+    images,
+    category,
+    description,
+    labels,
+    price,
+    discount,
+    show,
+    countInStock,
+  } = req.body;
+  const __dirname = path.resolve();
+  const product = await Product.findById(req.params.id);
+  if (product) {
+    const productImages = images.map(async (obj) => {
+      if (obj.local || obj.formData) {
+        return { image: obj.image, description: obj.description };
+      } else if (!obj.formData && !obj.local) {
+        // download image
+        const response = await fetch(obj.image);
+        const buffer = await response.buffer();
+        const type = await FileType.fromBuffer(buffer);
+        const fileName = `${uuidv4()}.${type.ext}`;
+
+        fs.writeFile(
+          path.join(__dirname, `/frontend/public/images/${fileName}`),
+          buffer,
+          () => console.log('done')
+        );
+        return {
+          image: fileName,
+          description: obj.description,
+        };
+      }
+    });
+    await Promise.all(productImages)
+      .then(async (result) => {
+        await product.updateOne({
+          $set: {
+            lastEditedBy: req.user._id,
+            name,
+            brand,
+            images: result,
+            category,
+            description,
+            labels,
+            price,
+            discount: {
+              amount: discount.amount,
+              expireDate: discount.expireDate,
+              totalPrice: discount.totalPrice,
+            },
+            show,
+            countInStock,
+          },
+        });
+        res.status(201).json(product._id);
+      })
+      .catch((err) => {
+        console.log('ERROR!', err);
+        res.status(500);
+        throw new Error('Saving  failed');
+      });
+  } else {
+    res.json(404);
+    throw new Error('Product not found');
+  }
+});
+
+export {
+  getProducts,
+  getAllProducts,
+  deleteProduct,
+  createProduct,
+  editProduct,
+};
