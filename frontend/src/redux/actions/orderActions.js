@@ -190,7 +190,10 @@ export const shipOrder = (orderId, tracking) => async (dispatch, getState) => {
   }
 }
 
-export const listAllOrders = () => async (dispatch, getState) => {
+export const listAllOrders = (page = "", rowsSize = 5, keyword = "") => async (
+  dispatch,
+  getState
+) => {
   try {
     dispatch({ type: ORDER_LIST_ALL_REQUEST })
 
@@ -201,7 +204,10 @@ export const listAllOrders = () => async (dispatch, getState) => {
     const config = {
       headers: { Authorization: `Bearer ${userInfo.token}` },
     }
-    const { data } = await axios.get(`/api/orders/all`, config)
+    const { data } = await axios.get(
+      `/api/orders/all?pageNumber=${page}&keyword=${keyword}&rowsSize=${rowsSize}`,
+      config
+    )
 
     dispatch({ type: ORDER_LIST_ALL_SUCCESS, payload: data })
   } catch (error) {
