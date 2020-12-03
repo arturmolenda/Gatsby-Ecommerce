@@ -56,7 +56,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
         }
       : {};
   const rows = await Product.countDocuments({ ...keyword });
-  if (rows <= rowsSize && page !== 0) page = 0;
+  if (rowsSize * page >= rows && page !== 0) page = 0;
   const products = await Product.find({ ...keyword })
     .sort({ createdAt: -1 })
     .limit(rowsSize)
