@@ -25,6 +25,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   Tooltip,
   Typography,
@@ -35,6 +36,7 @@ import { Alert } from "@material-ui/lab"
 
 import Loader from "../../Loader"
 import DeleteDialog from "../../DeleteDialog"
+import SearchField from "../../SearchField"
 
 const useStyles = makeStyles(() => ({
   tableHeadText: {
@@ -48,13 +50,7 @@ const useStyles = makeStyles(() => ({
     },
   },
   iconBtn: {
-    display: "inline-block",
     minWidth: 40,
-
-    "& .MuiButton-contained.Mui-disabled": {
-      boxShadow:
-        " 0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12)",
-    },
     "&:first-child": {
       marginRight: 16,
     },
@@ -67,13 +63,21 @@ const useStyles = makeStyles(() => ({
 const Users = () => {
   const [updatedUsers, setUpdatedUsers] = useState([])
   const [userToDelete, setUserToDelete] = useState(null)
+  const [keyword, setKeyword] = useState("")
+  const [rowsPerPage, setRowsPerPage] = useState(5)
   const classes = useStyles()
 
   const dispatch = useDispatch()
   const { userInfo } = useSelector(state => state.userLogin)
-  const { loading, users, success, error } = useSelector(
-    state => state.userListAll
-  )
+  const {
+    loading,
+    users,
+    page,
+    totalRows,
+    rowsSize,
+    success,
+    error,
+  } = useSelector(state => state.userListAll)
   const {
     loading: updateLoading,
     success: updateSuccess,
@@ -98,7 +102,9 @@ const Users = () => {
       updateSuccess ||
       deleteSuccess
     )
-      dispatch(listAllUsers())
+      if (page && totalRows && keyword) {
+        dispatch(listAllUsers(page, rowsPerPage, keyword))
+      } else dispatch(listAllUsers())
   }, [userInfo, updateSuccess, deleteSuccess])
 
   useEffect(() => {
@@ -126,6 +132,18 @@ const Users = () => {
     setUserToDelete(null)
   }
 
+  const changePageHandle = (e, newPage) => {
+    dispatch(listAllUsers(newPage, rowsPerPage, keyword))
+  }
+  const changeRowsPerPageHandle = e => {
+    console.log(e.target.value)
+    setRowsPerPage(e.target.value)
+    dispatch(listAllUsers(page, e.target.value, keyword))
+  }
+  const searchHandle = e => {
+    if (e.key === "Enter") dispatch(listAllUsers(page, rowsPerPage, keyword))
+  }
+
   console.log(updatedUsers)
   return (
     <Grid container justify="center">
@@ -133,46 +151,52 @@ const Users = () => {
         <Grid item md={10} sm={12} xs={12}>
           <Typography variant="h1">USERS</Typography>
 
-          {loading ? (
-            <Loader />
-          ) : (
-            <>
-              {error && (
-                <Alert className={classes.alert} severity="error">
-                  {error}
-                </Alert>
-              )}
-              {updateError && (
-                <Alert className={classes.alert} severity="error">
-                  {updateError}
-                </Alert>
-              )}
-              {updateSuccess && (
-                <Alert className={classes.alert} severity="success">
-                  User updated!
-                </Alert>
-              )}
-              {deleteError && (
-                <Alert className={classes.alert} severity="error">
-                  {deleteError}
-                </Alert>
-              )}
-              {deleteSuccess && (
-                <Alert className={classes.alert} severity="success">
-                  User deleted!
-                </Alert>
-              )}
-              <TableContainer component={Paper} style={{ marginTop: 10 }}>
-                <Table>
-                  <TableHead>
-                    <TableRow className={classes.tableHeadText}>
-                      <TableCell>ID</TableCell>
-                      <TableCell>NAME</TableCell>
-                      <TableCell>EMAIL</TableCell>
-                      <TableCell>ADMIN</TableCell>
-                      <TableCell></TableCell>
-                    </TableRow>
-                  </TableHead>
+          <>
+            {error && (
+              <Alert className={classes.alert} severity="error">
+                {error}
+              </Alert>
+            )}
+            {updateError && (
+              <Alert className={classes.alert} severity="error">
+                {updateError}
+              </Alert>
+            )}
+            {updateSuccess && (
+              <Alert className={classes.alert} severity="success">
+                User updated!
+              </Alert>
+            )}
+            {deleteError && (
+              <Alert className={classes.alert} severity="error">
+                {deleteError}
+              </Alert>
+            )}
+            {deleteSuccess && (
+              <Alert className={classes.alert} severity="success">
+                User deleted!
+              </Alert>
+            )}
+            <SearchField
+              value={keyword}
+              changeHandle={e => setKeyword(e.target.value)}
+              searchHandle={searchHandle}
+              placeholder="Find User..."
+              whiteTheme
+              disabled={loading}
+            />
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow className={classes.tableHeadText}>
+                    <TableCell>ID</TableCell>
+                    <TableCell>NAME</TableCell>
+                    <TableCell>EMAIL</TableCell>
+                    <TableCell>ADMIN</TableCell>
+                    <TableCell></TableCell>
+                  </TableRow>
+                </TableHead>
+                {!loading && (
                   <TableBody>
                     {users &&
                       users.length !== 0 &&
@@ -248,10 +272,25 @@ const Users = () => {
                         )
                       })}
                   </TableBody>
-                </Table>
-              </TableContainer>
-            </>
-          )}
+                )}
+              </Table>
+              {loading ? (
+                <div style={{ padding: "20px 0" }}>
+                  <Loader contained />
+                </div>
+              ) : (
+                <TablePagination
+                  rowsPerPageOptions={[5, 15, 50]}
+                  component="div"
+                  count={totalRows}
+                  rowsPerPage={rowsSize}
+                  page={page}
+                  onChangePage={changePageHandle}
+                  onChangeRowsPerPage={changeRowsPerPageHandle}
+                />
+              )}
+            </TableContainer>
+          </>
         </Grid>
       )}
       <DeleteDialog
