@@ -92,7 +92,10 @@ export const getOrderDetails = id => async (dispatch, getState) => {
   }
 }
 
-export const listMyOrders = () => async (dispatch, getState) => {
+export const listMyOrders = (page = "", rowsSize = 5) => async (
+  dispatch,
+  getState
+) => {
   try {
     dispatch({ type: ORDER_LIST_MY_REQUEST })
 
@@ -105,7 +108,10 @@ export const listMyOrders = () => async (dispatch, getState) => {
         Authorization: `Bearer ${userInfo.token}`,
       },
     }
-    const { data } = await axios.get(`/api/orders/myorders`, config)
+    const { data } = await axios.get(
+      `/api/orders/myorders?pageNumber=${page}&rowsSize=${rowsSize}`,
+      config
+    )
 
     dispatch({
       type: ORDER_LIST_MY_SUCCESS,
