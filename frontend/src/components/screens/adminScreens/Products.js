@@ -127,14 +127,7 @@ const Products = () => {
             </Button>
           </Link>
         </div>
-        <SearchField
-          value={keyword}
-          changeHandle={e => setKeyword(e.target.value)}
-          searchHandle={searchHandle}
-          placeholder="Find Product..."
-          whiteTheme
-          disabled={loading}
-        />
+
         {error && (
           <Alert className={classes.alert} severity="error">
             {error}
@@ -150,6 +143,14 @@ const Products = () => {
             Product deleted
           </Alert>
         )}
+        <SearchField
+          value={keyword}
+          changeHandle={e => setKeyword(e.target.value)}
+          searchHandle={searchHandle}
+          placeholder="Find Product..."
+          whiteTheme
+          disabled={loading}
+        />
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
