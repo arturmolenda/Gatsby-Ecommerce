@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { Link, navigate } from "gatsby"
 
 import { useDispatch, useSelector } from "react-redux"
@@ -14,6 +14,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   Typography,
 } from "@material-ui/core"
@@ -47,23 +48,48 @@ const useStyles = makeStyles(() => ({
 }))
 
 const Profile = () => {
+  const [rowsPerPage, setRowsPerPage] = useState(5)
   const dispatch = useDispatch()
   const { userInfo } = useSelector(state => state.userLogin)
-  const { loading, orders, error } = useSelector(state => state.orderListMy)
+  const {
+    loading,
+    orders,
+    page,
+    totalRows,
+    rowsSize,
+    success,
+    error,
+  } = useSelector(state => state.orderListMy)
+
+  console.log(orders, page, totalRows, rowsSize)
   const classes = useStyles()
 
   useEffect(() => {
     if (!userInfo) navigate("/login")
-    if (!orders) dispatch(listMyOrders())
     return () => {
       dispatch({ type: USER_UPDATE_RESET })
     }
-  }, [userInfo, orders])
+  }, [userInfo])
+
+  useEffect(() => {
+    if (!orders || (orders.length === 0 && !success)) {
+      if (page && totalRows) {
+        dispatch(listMyOrders(page, rowsPerPage))
+      } else dispatch(listMyOrders())
+    }
+  }, [])
+
+  const changePageHandle = (e, newPage) => {
+    dispatch(listMyOrders(newPage, rowsPerPage))
+  }
+  const changeRowsPerPageHandle = e => {
+    setRowsPerPage(e.target.value)
+    dispatch(listMyOrders(page, e.target.value))
+  }
 
   return (
     <>
-      {loading && <Loader />}
-      {userInfo && !loading && (
+      {userInfo && (
         <Grid container spacing={2}>
           <Grid item md={3} sm={12} xs={12}>
             <Typography variant="h2" className={classes.header}>
@@ -76,7 +102,7 @@ const Profile = () => {
               MY ORDERS
             </Typography>
             {error && <Alert severity="error">{error}</Alert>}
-            {orders && orders.length > 0 ? (
+            {(loading || orders.length > 0) && (
               <TableContainer component={Paper}>
                 <Table>
                   <TableHead>
@@ -89,42 +115,62 @@ const Profile = () => {
                       <TableCell></TableCell>
                     </TableRow>
                   </TableHead>
-                  <TableBody>
-                    {orders.map(item => (
-                      <TableRow
-                        key={item._id}
-                        className={classes.tableBackground}
-                      >
-                        <TableCell>{item._id}</TableCell>
-                        <TableCell>{item.createdAt.substring(0, 10)}</TableCell>
-                        <TableCell>${item.totalPrice}</TableCell>
-                        <TableCell>
-                          {item.isPaid ? (
-                            item.paidAt.substring(0, 10)
-                          ) : (
-                            <ClearIcon color="secondary" />
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {item.shipped ? (
-                            item.shippedAt.substring(0, 10)
-                          ) : (
-                            <ClearIcon color="secondary" />
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <Link to={`/order/${item._id}`}>
-                            <Button variant="contained" color="primary">
-                              Details
-                            </Button>
-                          </Link>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
+                  {!loading && orders && orders.length > 0 && (
+                    <TableBody>
+                      {orders.map(item => (
+                        <TableRow
+                          key={item._id}
+                          className={classes.tableBackground}
+                        >
+                          <TableCell>{item._id}</TableCell>
+                          <TableCell>
+                            {item.createdAt.substring(0, 10)}
+                          </TableCell>
+                          <TableCell>${item.totalPrice}</TableCell>
+                          <TableCell>
+                            {item.isPaid ? (
+                              item.paidAt.substring(0, 10)
+                            ) : (
+                              <ClearIcon color="secondary" />
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {item.shipped ? (
+                              item.shippedAt.substring(0, 10)
+                            ) : (
+                              <ClearIcon color="secondary" />
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Link to={`/order/${item._id}`}>
+                              <Button variant="contained" color="primary">
+                                Details
+                              </Button>
+                            </Link>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  )}
                 </Table>
+                {loading ? (
+                  <div style={{ padding: "20px 0" }}>
+                    <Loader contained />
+                  </div>
+                ) : (
+                  <TablePagination
+                    rowsPerPageOptions={[5, 15, 50]}
+                    component="div"
+                    count={totalRows}
+                    rowsPerPage={rowsSize}
+                    page={page}
+                    onChangePage={changePageHandle}
+                    onChangeRowsPerPage={changeRowsPerPageHandle}
+                  />
+                )}
               </TableContainer>
-            ) : (
+            )}
+            {success && orders.length === 0 && (
               <div className={classes.emptyContainer}>
                 <ShoppingBasketIcon style={{ width: 120, height: 120 }} />
                 <Alert
