@@ -23,11 +23,15 @@ const getProducts = asyncHandler(async (req, res) => {
     const pageSize = 10;
     const page = Number(req.query.pageNumber) || 1;
     const keyword = req.query.keyword
-      ? { name: { $regex: req.query.keyword, $options: 'i' } }
+      ? {
+          $or: [
+            { category: { $regex: req.query.keyword, $options: 'i' } },
+            { brand: { $regex: req.query.keyword, $options: 'i' } },
+            { name: { $regex: req.query.keyword, $options: 'i' } },
+          ],
+        }
       : {};
-    console.log(keyword);
     const count = await Product.countDocuments({ show: true, ...keyword });
-    console.log(count);
     const products = await Product.find({ show: true, ...keyword })
       .limit(pageSize)
       .skip(pageSize * (page - 1));
@@ -36,11 +40,29 @@ const getProducts = asyncHandler(async (req, res) => {
 });
 
 // @desc    Get all products
-// @route   GET /api/products/all
+// @route   GET /api/products/all?pageNumber=&keyword=&rowsSize=
 // @access  Private/Admin
 const getAllProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find().sort({ createdAt: -1 });
-  res.json(products);
+  const rowsSize = Number(req.query.rowsSize) || 5;
+  let page = Number(req.query.pageNumber) || 0;
+  const keyword =
+    req.query.keyword.trim() !== ''
+      ? {
+          $or: [
+            { category: { $regex: req.query.keyword, $options: 'i' } },
+            { brand: { $regex: req.query.keyword, $options: 'i' } },
+            { name: { $regex: req.query.keyword, $options: 'i' } },
+          ],
+        }
+      : {};
+  const rows = await Product.countDocuments({ ...keyword });
+  if (rowsSize * page >= rows && page !== 0) page = 0;
+  const products = await Product.find({ ...keyword })
+    .sort({ createdAt: -1 })
+    .limit(rowsSize)
+    .skip(rowsSize * page);
+
+  res.json({ products, page, rows, rowsSize });
 });
 
 // @desc    Delete product

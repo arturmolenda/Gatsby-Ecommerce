@@ -21,6 +21,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   Typography,
 } from "@material-ui/core"
@@ -31,6 +32,7 @@ import { Alert } from "@material-ui/lab"
 import Image from "../../Image"
 import Loader from "../../Loader"
 import DeleteDialog from "../../DeleteDialog"
+import SearchField from "../../SearchField"
 
 const useStyles = makeStyles(() => ({
   tableBackground: {
@@ -55,12 +57,20 @@ const useStyles = makeStyles(() => ({
 
 const Products = () => {
   const [productToDelete, setProductToDelete] = useState(null)
+  const [keyword, setKeyword] = useState("")
+  const [rowsPerPage, setRowsPerPage] = useState(5)
   const classes = useStyles()
   const dispatch = useDispatch()
   const { userInfo } = useSelector(state => state.userLogin)
-  const { loading, products, success, error } = useSelector(
-    state => state.productListAll
-  )
+  const {
+    loading,
+    products,
+    page,
+    totalRows,
+    rowsSize,
+    success,
+    error,
+  } = useSelector(state => state.productListAll)
   const {
     loading: deleteLoading,
     success: deleteSuccess,
@@ -76,7 +86,9 @@ const Products = () => {
       (products.length === 0 && !success) ||
       deleteSuccess
     ) {
-      dispatch(listAllProducts())
+      if (page && totalRows && keyword) {
+        dispatch(listAllProducts(page, rowsPerPage, keyword))
+      } else dispatch(listAllProducts())
     }
   }, [userInfo, deleteSuccess])
 
@@ -92,6 +104,18 @@ const Products = () => {
     setProductToDelete(null)
   }
 
+  const changePageHandle = (e, newPage) => {
+    dispatch(listAllProducts(newPage, rowsPerPage, keyword))
+  }
+  const changeRowsPerPageHandle = e => {
+    console.log(e.target.value)
+    setRowsPerPage(e.target.value)
+    dispatch(listAllProducts(page, e.target.value, keyword))
+  }
+  const searchHandle = e => {
+    if (e.key === "Enter") dispatch(listAllProducts(page, rowsPerPage, keyword))
+  }
+
   return (
     <Grid container justify="center">
       <Grid item md={10} sm={12} xs={12}>
@@ -103,6 +127,7 @@ const Products = () => {
             </Button>
           </Link>
         </div>
+
         {error && (
           <Alert className={classes.alert} severity="error">
             {error}
@@ -118,22 +143,28 @@ const Products = () => {
             Product deleted
           </Alert>
         )}
-        {loading ? (
-          <Loader />
-        ) : (
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Image</TableCell>
-                  <TableCell>Brand</TableCell>
-                  <TableCell>Product</TableCell>
-                  <TableCell>Price</TableCell>
-                  <TableCell>In stock</TableCell>
-                  <TableCell>Rating</TableCell>
-                  <TableCell></TableCell>
-                </TableRow>
-              </TableHead>
+        <SearchField
+          value={keyword}
+          changeHandle={e => setKeyword(e.target.value)}
+          searchHandle={searchHandle}
+          placeholder="Find Product..."
+          whiteTheme
+          disabled={loading}
+        />
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Image</TableCell>
+                <TableCell>Brand</TableCell>
+                <TableCell>Product</TableCell>
+                <TableCell>Price</TableCell>
+                <TableCell>In stock</TableCell>
+                <TableCell>Rating</TableCell>
+                <TableCell></TableCell>
+              </TableRow>
+            </TableHead>
+            {!loading && (
               <TableBody>
                 {products &&
                   products.length !== 0 &&
@@ -200,9 +231,24 @@ const Products = () => {
                     </TableRow>
                   ))}
               </TableBody>
-            </Table>
-          </TableContainer>
-        )}
+            )}
+          </Table>
+          {loading ? (
+            <div style={{ padding: "20px 0" }}>
+              <Loader contained />
+            </div>
+          ) : (
+            <TablePagination
+              rowsPerPageOptions={[5, 15, 50]}
+              component="div"
+              count={totalRows}
+              rowsPerPage={rowsSize}
+              page={page}
+              onChangePage={changePageHandle}
+              onChangeRowsPerPage={changeRowsPerPageHandle}
+            />
+          )}
+        </TableContainer>
       </Grid>
       <DeleteDialog
         open={productToDelete}

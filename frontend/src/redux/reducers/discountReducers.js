@@ -45,7 +45,10 @@ export const discountListAllReducer = (state = { discounts: [] }, action) => {
     case DISCOUNT_LIST_ALL_REQUEST:
       return { loading: true }
     case DISCOUNT_LIST_ALL_SUCCESS:
-      return { loading: false, discounts: action.payload }
+      return { loading: false, discounts: action.payload.discounts,
+        page: action.payload.page,
+        totalRows: action.payload.rows,
+        rowsSize: action.payload.rowsSize, }
     case DISCOUNT_LIST_ALL_FAIL:
       return { loading: false, error: action.payload }
     case DISCOUNT_LIST_ALL_RESET:

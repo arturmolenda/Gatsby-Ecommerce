@@ -74,7 +74,14 @@ export const userListAllReducer = (state = { users: [] }, action) => {
     case USER_LIST_ALL_REQUEST:
       return { loading: true }
     case USER_LIST_ALL_SUCCESS:
-      return { loading: false, users: action.payload }
+      return {
+        loading: false,
+        users: action.payload.users,
+        page: action.payload.page,
+        totalRows: action.payload.rows,
+        rowsSize: action.payload.rowsSize,
+        success: true,
+      }
     case USER_LIST_ALL_FAIL:
       return { loading: false, error: action.payload }
     case USER_LIST_ALL_RESET:

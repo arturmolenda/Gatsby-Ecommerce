@@ -112,11 +112,34 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 });
 
 // @desc    Get all users
-// @route   GET /api/users
+// @route   GET /api/users?pageNumber=&keyword=&rowsSize=
 // @access  Private/Admin
 const getUsers = asyncHandler(async (req, res) => {
-  const users = await User.find().select('-password').sort({ createdAt: -1 });
-  res.json(users);
+  const idRegex = /^[0-9a-fA-F]{24}$/;
+  const rowsSize = Number(req.query.rowsSize) || 5;
+  let page = Number(req.query.pageNumber) || 0;
+  const keyword = req.query.keyword;
+  const keywordSearch =
+    keyword.trim() !== ''
+      ? keyword.match(idRegex)
+        ? { _id: keyword }
+        : {
+            $or: [
+              { name: { $regex: keyword, $options: 'i' } },
+              { email: { $regex: keyword, $options: 'i' } },
+              { isAdmin: keyword.toLowerCase() === 'admin' ? true : null },
+            ],
+          }
+      : {};
+  const rows = await User.countDocuments({ ...keywordSearch });
+  if (rowsSize * page >= rows && page !== 0) page = 0;
+  const users = await User.find({ ...keywordSearch })
+    .select('-password')
+    .sort({ createdAt: -1 })
+    .limit(rowsSize)
+    .skip(rowsSize * page);
+
+  res.json({ users, page, rows, rowsSize });
 });
 
 // @desc    Update user permissions

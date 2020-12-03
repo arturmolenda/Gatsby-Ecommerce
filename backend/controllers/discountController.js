@@ -53,7 +53,7 @@ const validateDiscount = asyncHandler(async (req, res) => {
 });
 
 // @desc    Get all discounts
-// @route   GET /api/discounts?id=
+// @route   GET /api/discounts?id=&pageNumber=&keyword=&rowsSize=
 // @access  Private/Admin
 const getAllDiscounts = asyncHandler(async (req, res) => {
   const id = req.query.id;
@@ -66,8 +66,29 @@ const getAllDiscounts = asyncHandler(async (req, res) => {
       throw new Error('Discount not found');
     }
   } else {
-    const discounts = await Discount.find().sort({ createdAt: -1 });
-    res.json(discounts);
+    const idRegex = /^[0-9a-fA-F]{24}$/;
+    const rowsSize = Number(req.query.rowsSize) || 5;
+    let page = Number(req.query.pageNumber) || 0;
+    const keyword = req.query.keyword;
+    const keywordSearch =
+      keyword.trim() !== ''
+        ? keyword.match(idRegex)
+          ? { $or: [{ _id: keyword }, { user: keyword }] }
+          : {
+              $or: [
+                { code: { $regex: keyword, $options: 'i' } },
+                { isActive: keyword.toLowerCase() === 'active' ? true : null },
+              ],
+            }
+        : {};
+    const rows = await Discount.countDocuments({ ...keywordSearch });
+    if (rowsSize * page >= rows && page !== 0) page = 0;
+    const discounts = await Discount.find({ ...keywordSearch })
+      .sort({ createdAt: -1 })
+      .limit(rowsSize)
+      .skip(rowsSize * page);
+
+    res.json({ discounts, page, rows, rowsSize });
   }
 });
 

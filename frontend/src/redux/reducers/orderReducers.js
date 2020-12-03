@@ -106,7 +106,14 @@ export const orderListAllReducer = (state = { orders: [] }, action) => {
         loading: true,
       }
     case ORDER_LIST_ALL_SUCCESS:
-      return { loading: false, success: true, orders: action.payload }
+      return {
+        loading: false,
+        success: true,
+        orders: action.payload.orders,
+        page: action.payload.page,
+        totalRows: action.payload.rows,
+        rowsSize: action.payload.rowsSize,
+      }
     case ORDER_LIST_ALL_FAIL:
       return { loading: false, error: action.payload }
     case ORDER_LIST_ALL_RESET:

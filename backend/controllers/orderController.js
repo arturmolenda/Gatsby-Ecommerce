@@ -119,11 +119,34 @@ const updateOrderToShipped = asyncHandler(async (req, res) => {
 });
 
 // @desc    Get all orders
-// @route   GET /api/orders/all
+// @route   GET /api/orders/all?pageNumber=&keyword=&rowsSize=
 // @access  Private/Admin
 const getAllOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find().sort({ createdAt: -1 });
-  res.json(orders);
+  const idRegex = /^[0-9a-fA-F]{24}$/;
+  const rowsSize = Number(req.query.rowsSize) || 5;
+  let page = Number(req.query.pageNumber) || 0;
+  const keyword = req.query.keyword;
+  const keywordSearch =
+    keyword.trim() !== ''
+      ? keyword.match(idRegex)
+        ? { _id: keyword }
+        : {
+            $or: [
+              { 'user.name': { $regex: keyword, $options: 'i' } },
+              { 'user.email': { $regex: keyword, $options: 'i' } },
+              { isPaid: keyword.toLowerCase() === 'paid' ? true : null },
+              { shipped: keyword.toLowerCase() === 'shipped' ? true : null },
+            ],
+          }
+      : {};
+  const rows = await Order.countDocuments({ ...keywordSearch });
+  if (rowsSize * page >= rows && page !== 0) page = 0;
+  const orders = await Order.find({ ...keywordSearch })
+    .sort({ createdAt: -1 })
+    .limit(rowsSize)
+    .skip(rowsSize * page);
+
+  res.json({ orders, page, rows, rowsSize });
 });
 
 // @desc    Delete order

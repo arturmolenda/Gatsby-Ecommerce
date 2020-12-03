@@ -18,6 +18,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   Typography,
 } from "@material-ui/core"
@@ -33,6 +34,7 @@ import {
   ORDER_DELETE_RESET,
   ORDER_LIST_ALL_RESET,
 } from "../../../redux/constants/orderConstants"
+import SearchField from "../../SearchField"
 
 const useStyles = makeStyles(() => ({
   tableBackground: {
@@ -53,17 +55,27 @@ const useStyles = makeStyles(() => ({
 
 const Orders = () => {
   const [orderToDelete, setOrderToDelete] = useState(null)
+  const [keyword, setKeyword] = useState("")
+  const [rowsPerPage, setRowsPerPage] = useState(5)
   const classes = useStyles()
   const dispatch = useDispatch()
   const { userInfo } = useSelector(state => state.userLogin)
-  const { loading, orders, success, error } = useSelector(
-    state => state.orderListAll
-  )
+  const {
+    loading,
+    orders,
+    page,
+    totalRows,
+    rowsSize,
+    success,
+    error,
+  } = useSelector(state => state.orderListAll)
   const {
     loading: deleteLoading,
     success: deleteSuccess,
     error: deleteError,
   } = useSelector(state => state.orderDelete)
+
+  console.log(totalRows, rowsSize, page)
 
   const resetDeleteAlert = () => {
     dispatch({ type: ORDER_DELETE_RESET })
@@ -71,8 +83,11 @@ const Orders = () => {
 
   useEffect(() => {
     if (!userInfo || !userInfo.isAdmin) navigate("/login")
-    else if (!orders || (orders.length === 0 && !success) || deleteSuccess)
-      dispatch(listAllOrders())
+    else if (!orders || (orders.length === 0 && !success) || deleteSuccess) {
+      if (page && totalRows && keyword) {
+        dispatch(listAllOrders(page, rowsPerPage, keyword))
+      } else dispatch(listAllOrders())
+    }
   }, [userInfo, deleteSuccess])
 
   useEffect(() => {
@@ -86,6 +101,18 @@ const Orders = () => {
     setOrderToDelete(null)
     resetDeleteAlert()
     if (orderToDelete) dispatch(deleteOrder(orderToDelete))
+  }
+
+  const changePageHandle = (e, newPage) => {
+    dispatch(listAllOrders(newPage, rowsPerPage, keyword))
+  }
+  const changeRowsPerPageHandle = e => {
+    console.log(e.target.value)
+    setRowsPerPage(e.target.value)
+    dispatch(listAllOrders(page, e.target.value, keyword))
+  }
+  const searchHandle = e => {
+    if (e.key === "Enter") dispatch(listAllOrders(page, rowsPerPage, keyword))
   }
 
   return (
@@ -107,22 +134,28 @@ const Orders = () => {
             {deleteError}
           </Alert>
         )}
-        {loading ? (
-          <Loader />
-        ) : (
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell>USER</TableCell>
-                  <TableCell>DATE</TableCell>
-                  <TableCell>TOTAL</TableCell>
-                  <TableCell>PAID</TableCell>
-                  <TableCell>SHIPPED</TableCell>
-                  <TableCell></TableCell>
-                </TableRow>
-              </TableHead>
+        <SearchField
+          value={keyword}
+          changeHandle={e => setKeyword(e.target.value)}
+          searchHandle={searchHandle}
+          placeholder="Find Order..."
+          whiteTheme
+          disabled={loading}
+        />
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>ID</TableCell>
+                <TableCell>USER</TableCell>
+                <TableCell>DATE</TableCell>
+                <TableCell>TOTAL</TableCell>
+                <TableCell>PAID</TableCell>
+                <TableCell>SHIPPED</TableCell>
+                <TableCell></TableCell>
+              </TableRow>
+            </TableHead>
+            {!loading && (
               <TableBody>
                 {orders &&
                   orders.length > 0 &&
@@ -182,9 +215,24 @@ const Orders = () => {
                     </TableRow>
                   ))}
               </TableBody>
-            </Table>
-          </TableContainer>
-        )}
+            )}
+          </Table>
+          {loading ? (
+            <div style={{ padding: "20px 0" }}>
+              <Loader contained />
+            </div>
+          ) : (
+            <TablePagination
+              rowsPerPageOptions={[5, 15, 50]}
+              component="div"
+              count={totalRows}
+              rowsPerPage={rowsSize}
+              page={page}
+              onChangePage={changePageHandle}
+              onChangeRowsPerPage={changeRowsPerPageHandle}
+            />
+          )}
+        </TableContainer>
       </Grid>
       <DeleteDialog
         open={orderToDelete}

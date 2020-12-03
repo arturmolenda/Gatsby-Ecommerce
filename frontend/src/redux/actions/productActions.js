@@ -43,7 +43,11 @@ export const listProducts = (page = "", keyword = "") => async dispatch => {
   }
 }
 
-export const listAllProducts = () => async (dispatch, getState) => {
+export const listAllProducts = (
+  page = "",
+  rowsSize = 5,
+  keyword = ""
+) => async (dispatch, getState) => {
   try {
     dispatch({ type: PRODUCT_LIST_ALL_REQUEST })
 
@@ -57,7 +61,10 @@ export const listAllProducts = () => async (dispatch, getState) => {
       },
     }
 
-    const { data } = await axios.get("/api/products/all", config)
+    const { data } = await axios.get(
+      `/api/products/all?pageNumber=${page}&keyword=${keyword}&rowsSize=${rowsSize}`,
+      config
+    )
     console.log(data)
     dispatch({ type: PRODUCT_LIST_ALL_SUCCESS, payload: data })
   } catch (error) {

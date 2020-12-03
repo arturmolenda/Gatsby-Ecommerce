@@ -60,7 +60,11 @@ export const applyDiscount = (coupon, price) => async (dispatch, getState) => {
   }
 }
 
-export const listAllDiscounts = () => async (dispatch, getState) => {
+export const listAllDiscounts = (
+  page = "",
+  rowsSize = 5,
+  keyword = ""
+) => async (dispatch, getState) => {
   try {
     dispatch({ type: DISCOUNT_LIST_ALL_REQUEST })
 
@@ -73,7 +77,10 @@ export const listAllDiscounts = () => async (dispatch, getState) => {
         Authorization: `Bearer ${userInfo.token}`,
       },
     }
-    const { data } = await axios.get(`/api/discounts`, config)
+    const { data } = await axios.get(
+      `/api/discounts?pageNumber=${page}&keyword=${keyword}&rowsSize=${rowsSize}`,
+      config
+    )
 
     dispatch({
       type: DISCOUNT_LIST_ALL_SUCCESS,

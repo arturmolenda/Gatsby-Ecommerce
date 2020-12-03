@@ -11,14 +11,9 @@ import ProductCard from "./ProductCard"
 import ProductSkeleton from "../ProductSkeleton"
 const Products = props => {
   const dispatch = useDispatch()
-  const {
-    loading,
-    error,
-    products,
-    page: currentPage,
-    pages,
-    success,
-  } = useSelector(state => state.productList)
+  const { loading, error, products, page: currentPage, pages } = useSelector(
+    state => state.productList
+  )
 
   const keyword = props.keyword
   const page = props.pageNumber
@@ -36,7 +31,7 @@ const Products = props => {
       {keyword && (
         <Link to={"/"}>
           <Button startIcon={<ArrowBackIcon />} style={{ marginBottom: 10 }}>
-            Go back
+            Browse all products
           </Button>
         </Link>
       )}
