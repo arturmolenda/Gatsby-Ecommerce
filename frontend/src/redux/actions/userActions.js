@@ -114,7 +114,10 @@ export const updateUserDetails = user => async (dispatch, getState) => {
   }
 }
 
-export const listAllUsers = () => async (dispatch, getState) => {
+export const listAllUsers = (page = "", rowsSize = 5, keyword = "") => async (
+  dispatch,
+  getState
+) => {
   try {
     dispatch({ type: USER_LIST_ALL_REQUEST })
 
@@ -127,7 +130,10 @@ export const listAllUsers = () => async (dispatch, getState) => {
         Authorization: `Bearer ${userInfo.token}`,
       },
     }
-    const { data } = await axios.get("/api/users", config)
+    const { data } = await axios.get(
+      `/api/users?pageNumber=${page}&keyword=${keyword}&rowsSize=${rowsSize}`,
+      config
+    )
 
     dispatch({ type: USER_LIST_ALL_SUCCESS, payload: data })
   } catch (error) {
