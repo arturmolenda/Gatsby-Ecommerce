@@ -129,17 +129,13 @@ const getAllOrders = asyncHandler(async (req, res) => {
   const keywordSearch =
     keyword.trim() !== ''
       ? keyword.match(idRegex)
-        ? {
-            $or: [
-              { 'user.name': { $regex: keyword, $options: 'i' } },
-              { 'user.email': { $regex: keyword, $options: 'i' } },
-              { _id: keyword },
-            ],
-          }
+        ? { _id: keyword }
         : {
             $or: [
               { 'user.name': { $regex: keyword, $options: 'i' } },
               { 'user.email': { $regex: keyword, $options: 'i' } },
+              { isPaid: keyword.toLowerCase() === 'paid' ? true : null },
+              { shipped: keyword.toLowerCase() === 'shipped' ? true : null },
             ],
           }
       : {};
