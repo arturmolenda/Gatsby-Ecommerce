@@ -55,7 +55,14 @@ export const productListAllReducer = (
     case PRODUCT_LIST_ALL_REQUEST:
       return { loading: true, products: [] }
     case PRODUCT_LIST_ALL_SUCCESS:
-      return { loading: false, products: action.payload, success: true }
+      return {
+        loading: false,
+        products: action.payload.products,
+        page: action.payload.page,
+        totalRows: action.payload.rows,
+        rowsSize: action.payload.rowsSize,
+        success: true,
+      }
     case PRODUCT_LIST_ALL_FAIL:
       return { loading: false, error: action.payload }
     case PRODUCT_LIST_ALL_RESET:
