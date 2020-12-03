@@ -70,13 +70,19 @@ const getOrderById = asyncHandler(async (req, res) => {
 });
 
 // @desc    Get orders
-// @route   GET /api/orders/myorders
+// @route   GET /api/orders/myorders?pageNumber=&rowsSize=
 // @access  Private
 const getMyOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find({ 'user._id': req.user._id }).sort({
-    createdAt: -1,
-  });
-  res.json(orders);
+  const rowsSize = Number(req.query.rowsSize) || 5;
+  let page = Number(req.query.pageNumber) || 0;
+  const rows = await Order.countDocuments({ 'user._id': req.user._id });
+  if (rowsSize * page >= rows && page !== 0) page = 0;
+  const orders = await Order.find({ 'user._id': req.user._id })
+    .sort({ createdAt: -1 })
+    .limit(rowsSize)
+    .skip(rowsSize * page);
+
+  res.json({ orders, page, rows, rowsSize });
 });
 
 // @desc    Update order to paid
