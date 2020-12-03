@@ -21,6 +21,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   Typography,
 } from "@material-ui/core"
@@ -33,6 +34,7 @@ import { Alert } from "@material-ui/lab"
 import Loader from "../../Loader"
 import DeleteDialog from "../../DeleteDialog"
 import moment from "moment"
+import SearchField from "../../SearchField"
 
 const useStyles = makeStyles(() => ({
   tableBackground: {
@@ -57,12 +59,20 @@ const useStyles = makeStyles(() => ({
 
 const Discounts = () => {
   const [discountToDelete, setDiscountToDelete] = useState(null)
+  const [keyword, setKeyword] = useState("")
+  const [rowsPerPage, setRowsPerPage] = useState(5)
   const classes = useStyles()
   const dispatch = useDispatch()
   const { userInfo } = useSelector(state => state.userLogin)
-  const { loading, discounts, success, error } = useSelector(
-    state => state.discountListAll
-  )
+  const {
+    loading,
+    discounts,
+    page,
+    totalRows,
+    rowsSize,
+    success,
+    error,
+  } = useSelector(state => state.discountListAll)
   const {
     loading: deleteLoading,
     success: deleteSuccess,
@@ -78,7 +88,9 @@ const Discounts = () => {
       (discounts.length === 0 && !success) ||
       deleteSuccess
     ) {
-      dispatch(listAllDiscounts())
+      if (page && totalRows && keyword) {
+        dispatch(listAllDiscounts(page, rowsPerPage, keyword))
+      } else dispatch(listAllDiscounts())
     }
   }, [userInfo, deleteSuccess])
 
@@ -92,6 +104,19 @@ const Discounts = () => {
     resetDeleteAlert()
     dispatch(deleteDiscount(discountToDelete))
     setDiscountToDelete(null)
+  }
+
+  const changePageHandle = (e, newPage) => {
+    dispatch(listAllDiscounts(newPage, rowsPerPage, keyword))
+  }
+  const changeRowsPerPageHandle = e => {
+    console.log(e.target.value)
+    setRowsPerPage(e.target.value)
+    dispatch(listAllDiscounts(page, e.target.value, keyword))
+  }
+  const searchHandle = e => {
+    if (e.key === "Enter")
+      dispatch(listAllDiscounts(page, rowsPerPage, keyword))
   }
 
   return (
@@ -120,22 +145,29 @@ const Discounts = () => {
             Coupon deleted
           </Alert>
         )}
-        {loading ? (
-          <Loader />
-        ) : (
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell>CODE</TableCell>
-                  <TableCell>DISCOUNT</TableCell>
-                  <TableCell>AMOUNT LEFT</TableCell>
-                  <TableCell>EXPIRES</TableCell>
-                  <TableCell>ACTIVE</TableCell>
-                  <TableCell></TableCell>
-                </TableRow>
-              </TableHead>
+        <SearchField
+          value={keyword}
+          changeHandle={e => setKeyword(e.target.value)}
+          searchHandle={searchHandle}
+          placeholder="Find Order..."
+          whiteTheme
+          disabled={loading}
+        />
+
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>ID</TableCell>
+                <TableCell>CODE</TableCell>
+                <TableCell>DISCOUNT</TableCell>
+                <TableCell>AMOUNT LEFT</TableCell>
+                <TableCell>EXPIRES</TableCell>
+                <TableCell>ACTIVE</TableCell>
+                <TableCell></TableCell>
+              </TableRow>
+            </TableHead>
+            {!loading && (
               <TableBody>
                 {discounts &&
                   discounts.length !== 0 &&
@@ -195,9 +227,24 @@ const Discounts = () => {
                     </TableRow>
                   ))}
               </TableBody>
-            </Table>
-          </TableContainer>
-        )}
+            )}
+          </Table>
+          {loading ? (
+            <div style={{ padding: "20px 0" }}>
+              <Loader contained />
+            </div>
+          ) : (
+            <TablePagination
+              rowsPerPageOptions={[5, 15, 50]}
+              component="div"
+              count={totalRows}
+              rowsPerPage={rowsSize}
+              page={page}
+              onChangePage={changePageHandle}
+              onChangeRowsPerPage={changeRowsPerPageHandle}
+            />
+          )}
+        </TableContainer>
       </Grid>
       <DeleteDialog
         open={discountToDelete}
