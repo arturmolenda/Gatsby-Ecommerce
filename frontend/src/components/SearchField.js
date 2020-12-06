@@ -14,11 +14,16 @@ const useStyles = makeStyles(theme => ({
         fade(theme.palette.common.white, props.whiteTheme ? 0.65 : 0.25),
     },
     marginRight: theme.spacing(2),
-    width: "auto",
-    maxWidth: props => (props.whiteTheme ? "30%" : "auto"),
+    width: props => (props.whiteTheme ? "30%" : "auto"),
     borderRadius: props => (props.whiteTheme ? 25 : theme.shape.borderRadius),
     marginBottom: props => props.whiteTheme && 10,
     display: "inline-block",
+    [theme.breakpoints.down("sm")]: {
+      width: props => (props.whiteTheme ? "40%" : "40%"),
+    },
+    [theme.breakpoints.down("xs")]: {
+      width: props => (props.whiteTheme ? "60%" : "40%"),
+    },
   },
   searchIcon: {
     padding: theme.spacing(0, 2),
