@@ -15,7 +15,7 @@ import PlaceOrder from "../components/screens/PlaceOrder"
 import Profile from "../components/screens/Profile"
 import Register from "../components/screens/Register"
 import Shipping from "../components/screens/Shipping"
-import Login from "../components/screens/Register"
+import Login from "../components/screens/Login"
 import Product from "../components/screens/Product"
 
 export default function Home({ location }) {

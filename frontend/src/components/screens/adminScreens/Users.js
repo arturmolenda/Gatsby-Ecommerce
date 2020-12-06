@@ -27,7 +27,6 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  Tooltip,
   Typography,
 } from "@material-ui/core"
 import DeleteIcon from "@material-ui/icons/Delete"
@@ -220,53 +219,54 @@ const Users = () => {
                                 disabled={user._id === userInfo._id}
                               />
                             </TableCell>
-                            <TableCell align="justify">
-                              <Tooltip title="Save" placement="top">
-                                <span className={classes.iconBtn}>
-                                  <Button
-                                    color="primary"
-                                    variant="contained"
-                                    size="small"
-                                    disabled={
-                                      !(
-                                        typeof updatedUsers[user._id] !==
-                                          "undefined" &&
-                                        updatedUsers[user._id] !== user.isAdmin
-                                      ) || updateLoading === user._id
-                                    }
-                                    onClick={() =>
-                                      updatePermissionsHandle(
-                                        user._id,
-                                        updatedUsers[user._id]
-                                      )
-                                    }
-                                  >
-                                    <SaveIcon />
-                                    {updateLoading === user._id && (
-                                      <Loader button />
-                                    )}
-                                  </Button>
-                                </span>
-                              </Tooltip>
-                              <Tooltip title="Delete" placement="top">
-                                <span className={classes.iconBtn}>
-                                  <Button
-                                    color="secondary"
-                                    variant="contained"
-                                    size="small"
-                                    disabled={
-                                      user._id === userInfo._id ||
-                                      deleteLoading === user._id
-                                    }
-                                    onClick={() => setUserToDelete(user._id)}
-                                  >
-                                    <DeleteIcon />
-                                    {deleteLoading === user._id && (
-                                      <Loader button />
-                                    )}
-                                  </Button>
-                                </span>
-                              </Tooltip>
+                            <TableCell>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-evenly",
+                                }}
+                              >
+                                <Button
+                                  className={classes.iconBtn}
+                                  color="primary"
+                                  variant="contained"
+                                  size="small"
+                                  disabled={
+                                    !(
+                                      typeof updatedUsers[user._id] !==
+                                        "undefined" &&
+                                      updatedUsers[user._id] !== user.isAdmin
+                                    ) || updateLoading === user._id
+                                  }
+                                  onClick={() =>
+                                    updatePermissionsHandle(
+                                      user._id,
+                                      updatedUsers[user._id]
+                                    )
+                                  }
+                                >
+                                  <SaveIcon />
+                                  {updateLoading === user._id && (
+                                    <Loader button />
+                                  )}
+                                </Button>
+                                <Button
+                                  className={classes.iconBtn}
+                                  color="secondary"
+                                  variant="contained"
+                                  size="small"
+                                  disabled={
+                                    user._id === userInfo._id ||
+                                    deleteLoading === user._id
+                                  }
+                                  onClick={() => setUserToDelete(user._id)}
+                                >
+                                  <DeleteIcon />
+                                  {deleteLoading === user._id && (
+                                    <Loader button />
+                                  )}
+                                </Button>
+                              </div>
                             </TableCell>
                           </TableRow>
                         )
