@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React from "react"
 import { Link, navigate } from "gatsby"
 
 import { useDispatch, useSelector } from "react-redux"
@@ -6,8 +6,6 @@ import { addToCart, removeFromCart } from "../../redux/actions/cartActions"
 
 import {
   Button,
-  Card,
-  Collapse,
   Grid,
   makeStyles,
   Paper,
@@ -17,23 +15,26 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
   Typography,
 } from "@material-ui/core"
 import DeleteIcon from "@material-ui/icons/Delete"
 import Image from "../Image"
 import QtySelect from "../QtySelect"
 import { Alert } from "@material-ui/lab"
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore"
-import ExpandLessIcon from "@material-ui/icons/ExpandLess"
 import AddShoppingCartIcon from "@material-ui/icons/AddShoppingCart"
 import PaymentCard from "../PaymentCard"
+
 const useStyles = makeStyles(theme => ({
   cartContainer: {
     padding: "10px 10px 40px",
 
     [theme.breakpoints.down("sm")]: {
       padding: "10px 0px 40px",
+    },
+  },
+  productsTableFix: {
+    [theme.breakpoints.down("xs")]: {
+      display: "initial",
     },
   },
   emptyContainer: {
@@ -47,13 +48,10 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const Cart = () => {
-  const [coupon, setCoupon] = useState("")
-  const [expanded, setExpanded] = useState(false)
   const dispatch = useDispatch()
   const { productId: productLoading, cartItems } = useSelector(
     state => state.cart
   )
-  const error = false
 
   const classes = useStyles()
 
@@ -69,7 +67,7 @@ const Cart = () => {
       <Typography variant="h1" style={{ margin: "18px 0" }}>
         SHOPPING CART
       </Typography>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} className={classes.productsTableFix}>
         {cartItems.length !== 0 ? (
           <>
             <Grid item md={8} sm={12}>
