@@ -40,3 +40,25 @@ h1.MuiTypography-h1 {
 th.MuiTableCell-head {
   font-weight: 600;
 }
+
+/* Home carousel styling */
+.carousel-arrow {
+  top: 0 !important;
+  height: 100% !important;
+  padding: 0 20px !important;
+  color: #676767 !important;
+}
+.carousel-arrow svg {
+  width: 1.5em;
+  height: 1.5em;
+}
+.carousel-prev svg {
+  margin-left: 0.7em;
+}
+.carousel-arrow:hover {
+  color: #000 !important;
+}
+
+.carousel-dots li {
+  margin: 0 !important;
+}

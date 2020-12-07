@@ -2,23 +2,33 @@ import React, { useEffect } from "react"
 import { Link, navigate } from "gatsby"
 
 import { useDispatch, useSelector } from "react-redux"
-import { listProducts } from "../../redux/actions/productActions"
+import {
+  listProducts,
+  listTopRatedProducts,
+} from "../../redux/actions/productActions"
 
 import { Button, Grid, Typography } from "@material-ui/core"
 import { Alert, Pagination } from "@material-ui/lab"
 import ArrowBackIcon from "@material-ui/icons/ArrowBack"
 import ProductCard from "./ProductCard"
 import ProductSkeleton from "../ProductSkeleton"
+import Carousel from "./Carousel"
 const Products = props => {
   const dispatch = useDispatch()
   const { loading, error, products, page: currentPage, pages } = useSelector(
     state => state.productList
   )
+  const {
+    loading: topLoading,
+    error: topError,
+    products: topProducts,
+  } = useSelector(state => state.productTopRated)
 
   const keyword = props.keyword
   const page = props.pageNumber
 
   useEffect(() => {
+    dispatch(listTopRatedProducts(4))
     dispatch(listProducts(page, keyword))
   }, [dispatch, page, keyword])
 
@@ -35,6 +45,7 @@ const Products = props => {
           </Button>
         </Link>
       )}
+      {!topLoading && !topError && <Carousel products={topProducts} />}
       <Typography variant="h1">
         {keyword ? "SHOWING SEARCH RESULTS" : "LATEST PRODUCTS"}
       </Typography>
