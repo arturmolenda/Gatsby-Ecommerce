@@ -25,6 +25,7 @@
     "gatsby-plugin-sharp": "^2.7.1",
     "gatsby-source-filesystem": "^2.4.2",
     "gatsby-transformer-sharp": "^2.5.21",
+    "infinite-react-carousel": "^1.2.11",
     "moment": "^2.29.1",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
