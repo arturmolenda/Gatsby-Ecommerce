@@ -20,6 +20,9 @@ import {
   PRODUCT_DETAILS_REQUEST,
   PRODUCT_DETAILS_SUCCESS,
   PRODUCT_DETAILS_FAIL,
+  PRODUCT_TOP_RATED_REQUEST,
+  PRODUCT_TOP_RATED_SUCCESS,
+  PRODUCT_TOP_RATED_FAIL,
 } from "../constants/productConstants"
 import axios from "axios"
 
@@ -212,6 +215,24 @@ export const getProductDetails = id => async (dispatch, getState) => {
   } catch (error) {
     dispatch({
       type: PRODUCT_DETAILS_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    })
+  }
+}
+
+export const listTopRatedProducts = (num = 3) => async dispatch => {
+  try {
+    dispatch({ type: PRODUCT_TOP_RATED_REQUEST })
+
+    const { data } = await axios.get(`/api/products/top?num=${num}`)
+
+    dispatch({ type: PRODUCT_TOP_RATED_SUCCESS, payload: data })
+  } catch (error) {
+    dispatch({
+      type: PRODUCT_TOP_RATED_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message

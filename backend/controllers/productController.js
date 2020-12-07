@@ -234,10 +234,22 @@ const editProduct = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc   Get top rated products
+// @route  GET /api/products/top?num=
+// @access Public
+const getTopProducts = asyncHandler(async (req, res) => {
+  const productsNum = req.query.num ? Number(req.query.num) : 3;
+  const products = await Product.find({})
+    .sort({ rating: -1 })
+    .limit(productsNum);
+  res.json(products);
+});
+
 export {
   getProducts,
   getAllProducts,
   deleteProduct,
   createProduct,
   editProduct,
+  getTopProducts,
 };

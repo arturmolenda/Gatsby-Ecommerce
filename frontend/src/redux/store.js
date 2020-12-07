@@ -23,6 +23,7 @@ import {
   productImageUploadReducer,
   productUpdateReducer,
   productDetailsReducer,
+  productTopRatedReducer,
 } from "./reducers/productReducers"
 import { cartReducer } from "./reducers/cartReducers"
 import {
@@ -56,6 +57,7 @@ const reducer = combineReducers({
   productUpdate: productUpdateReducer,
   productImageUpload: productImageUploadReducer,
   productDetails: productDetailsReducer,
+  productTopRated: productTopRatedReducer,
   cart: cartReducer,
   discountApply: discountApplyReducer,
   discountListAll: discountListAllReducer,
