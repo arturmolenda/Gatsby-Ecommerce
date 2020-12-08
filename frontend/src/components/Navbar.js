@@ -170,6 +170,7 @@ const Navbar = () => {
                     vertical: "top",
                     horizontal: "left",
                   }}
+                  style={{ zIndex: 1 }}
                 >
                   <ClickAwayListener onClickAway={() => setAnchorEl(null)}>
                     <Paper style={{ minWidth: 150, padding: "8px 0" }}>
@@ -205,6 +206,7 @@ const Navbar = () => {
           vertical: "top",
           horizontal: "left",
         }}
+        style={{ zIndex: 1 }}
       >
         <ClickAwayListener onClickAway={() => setAdminAnchorEl(null)}>
           <Paper style={{ minWidth: 150, padding: "8px 0" }}>
