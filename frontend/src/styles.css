@@ -62,3 +62,6 @@ th.MuiTableCell-head {
 .carousel-dots li {
   margin: 0 !important;
 }
+.carousel-dots {
+  margin-top: 0 !important;
+}

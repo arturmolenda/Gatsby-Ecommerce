@@ -10,9 +10,11 @@ import {
 import { Button, Grid, Typography } from "@material-ui/core"
 import { Alert, Pagination } from "@material-ui/lab"
 import ArrowBackIcon from "@material-ui/icons/ArrowBack"
-import ProductCard from "./ProductCard"
+import ProductCard from "../products/ProductCard"
 import ProductSkeleton from "../ProductSkeleton"
-import Carousel from "./Carousel"
+import Carousel from "../products/Carousel"
+import Loader from "../Loader"
+
 const Products = props => {
   const dispatch = useDispatch()
   const { loading, error, products, page: currentPage, pages } = useSelector(
@@ -37,7 +39,11 @@ const Products = props => {
     else navigate(`/page/${pageNum}`)
   }
   return (
-    <>
+    <div
+      style={{
+        marginTop: topProducts && !topError && !keyword && !page && -30,
+      }}
+    >
       {keyword && (
         <Link to={"/"}>
           <Button startIcon={<ArrowBackIcon />} style={{ marginBottom: 10 }}>
@@ -45,7 +51,20 @@ const Products = props => {
           </Button>
         </Link>
       )}
-      {!topLoading && !topError && <Carousel products={topProducts} />}
+
+      {topLoading ? (
+        <Loader contained />
+      ) : (
+        !topError &&
+        !keyword &&
+        !page && (
+          <Grid container spacing={3}>
+            <Grid item sm={12} xs={12}>
+              <Carousel products={topProducts} />
+            </Grid>
+          </Grid>
+        )
+      )}
       <Typography variant="h1">
         {keyword ? "SHOWING SEARCH RESULTS" : "LATEST PRODUCTS"}
       </Typography>
@@ -79,7 +98,7 @@ const Products = props => {
           )}
         </>
       )}
-    </>
+    </div>
   )
 }
 

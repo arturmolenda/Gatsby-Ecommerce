@@ -1,5 +1,5 @@
 import React from "react"
-import Products from "../components/products/Products"
+import Products from "../components/screens/Products"
 import { Router } from "@reach/router"
 import { Container } from "@material-ui/core"
 import Cart from "../components/screens/Cart"
