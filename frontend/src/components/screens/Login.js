@@ -20,7 +20,7 @@ import VisibilityOffIcon from "@material-ui/icons/VisibilityOff"
 import Loader from "../Loader"
 import Steps from "../Steps"
 
-const Login = ({ location }) => {
+const Login = ({ location, productReviewLogin }) => {
   const [email, setEmail] = useState("")
   const [emailError, setEmailError] = useState("")
   const [password, setPassword] = useState("")
@@ -30,12 +30,16 @@ const Login = ({ location }) => {
   const dispatch = useDispatch()
   const { loading, error, userInfo } = useSelector(state => state.userLogin)
 
-  console.log(location)
-  const redirect = location.search ? `/${location.search.split("=")[1]}` : "/"
+  const redirect =
+    location && location.search ? `/${location.search.split("=")[1]}` : "/"
+
+  const gridProps = productReviewLogin
+    ? { lg: 12, md: 12, sm: 12, xs: 12 }
+    : { lg: 4, md: 6, sm: 8, xs: 8 }
 
   useEffect(() => {
-    if (userInfo) navigate(redirect)
-  }, [dispatch, userInfo])
+    if (userInfo && !productReviewLogin) navigate(redirect)
+  }, [dispatch, userInfo, productReviewLogin])
 
   const validate = () => {
     let returnVal = true
@@ -73,7 +77,7 @@ const Login = ({ location }) => {
     <>
       {redirect === "/shipping" && <Steps activeStep={0} />}
       <Grid container justify="center">
-        <Grid item lg={4} md={6} sm={8} xs={8}>
+        <Grid item {...gridProps}>
           <form onSubmit={submitHandle} style={{ display: "grid" }}>
             <Typography variant="h1">SIGN IN</Typography>
             {error && <Alert severity="error">{error}</Alert>}
@@ -130,7 +134,7 @@ const Login = ({ location }) => {
 
       <Divider style={{ margin: 40 }} />
       <Grid container justify="center">
-        <Grid item lg={4} md={6} sm={8} xs={8}>
+        <Grid item {...gridProps}>
           <Typography variant="h1">NEW CUSTOMER?</Typography>
           <Link
             to={redirect === "/" ? "/register" : `/register${location.search}`}

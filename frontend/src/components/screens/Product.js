@@ -3,7 +3,7 @@ import { Link } from "gatsby"
 
 import { useDispatch, useSelector } from "react-redux"
 import { addToCart } from "../../redux/actions/cartActions"
-import { listProducts } from "../../redux/actions/productActions"
+import { getProductDetails } from "../../redux/actions/productActions"
 
 import {
   Button,
@@ -22,6 +22,7 @@ import Loader from "../Loader"
 import Rating from "../Rating"
 import QtySelect from "../QtySelect"
 import ProductLabels from "../products/ProductLabels"
+import ProductReviews from "../products/ProductReviews"
 
 const useStyles = makeStyles(theme => ({
   imageMiniature: {
@@ -32,6 +33,7 @@ const useStyles = makeStyles(theme => ({
     },
     [theme.breakpoints.down("xs")]: {
       width: 70,
+      display: "table",
     },
   },
   gridMobileFlex: {
@@ -43,7 +45,7 @@ const useStyles = makeStyles(theme => ({
     position: "relative",
     display: "grid",
   },
-  descriptionContainer: {
+  productActions: {
     ["@media (min-width: 1024px)"]: {
       marginLeft: "8%",
     },
@@ -63,26 +65,21 @@ const Product = ({ id, location, previewProduct }) => {
   const [successAlert, setSuccessAlert] = useState(false)
   const classes = useStyles()
   const dispatch = useDispatch()
-  const { loading, products, success, error } = useSelector(
-    state => state.productList
+  const { loading, product: currentProduct, error } = useSelector(
+    state => state.productDetails
   )
+
   const backLink =
     location && location.search ? `/${location.search.split("=")[1]}` : "/"
   useEffect(() => {
-    if (products.length !== 0 && !previewProduct) {
-      const foundProduct = products.find(product => product._id === id)
-      if (foundProduct) {
-        setProduct(foundProduct)
-        setCurrentImage(foundProduct.images[0])
-      }
-    } else if (products.length === 0) {
-      dispatch(listProducts())
-    }
-    if (previewProduct) {
+    if (previewProduct && previewProduct._id === id) {
       setProduct(previewProduct)
       setCurrentImage(previewProduct.images[0])
-    }
-  }, [dispatch, success, previewProduct])
+    } else if (currentProduct && currentProduct._id === id) {
+      setProduct(currentProduct)
+      setCurrentImage(currentProduct.images[0])
+    } else if (!loading) dispatch(getProductDetails(id))
+  }, [dispatch, currentProduct, previewProduct, id])
 
   const hoverHandle = imgObj => {
     setCurrentImage(imgObj)
@@ -94,6 +91,11 @@ const Product = ({ id, location, previewProduct }) => {
       setSuccessAlert(true)
     }
   }
+
+  const newRatingCb = rating => {
+    setProduct({ ...product, rating })
+  }
+
   console.log(backLink)
   return (
     <>
@@ -214,7 +216,7 @@ const Product = ({ id, location, previewProduct }) => {
                 </Grid>
               </Grid>
               <Grid item md={4} sm={5} xs={12}>
-                <div className={classes.descriptionContainer}>
+                <div className={classes.productActions}>
                   <Typography variant="h5" style={{ fontSize: "1.3rem" }}>
                     {product.brand}
                   </Typography>
@@ -274,6 +276,10 @@ const Product = ({ id, location, previewProduct }) => {
                       Add to cart
                     </Button>
                   </div>
+                  <ProductReviews
+                    productData={product}
+                    newRatingCb={newRatingCb}
+                  />
                 </div>
               </Grid>
               <Divider style={{ margin: "20px 0", width: "100%" }} />
