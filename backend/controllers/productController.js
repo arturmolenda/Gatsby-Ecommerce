@@ -245,6 +245,40 @@ const getTopProducts = asyncHandler(async (req, res) => {
   res.json(products);
 });
 
+// @desc   Review product
+// @route  POST /api/products/:id/reviews
+// @access Public
+const createProductReview = asyncHandler(async (req, res) => {
+  const { rating, comment } = req.body;
+  const product = await Product.findById(req.params.id);
+  if (product) {
+    const alreadyReview = product.reviews.find(
+      (r) => r.user.toString() === req.user._id.toString()
+    );
+
+    if (alreadyReview) {
+      res.status(400);
+      throw new Error('Product already review');
+    }
+    const review = {
+      name: req.user.name.split(' ')[0],
+      rating: Number(rating),
+      comment,
+      user: req.user._id,
+    };
+    product.reviews.push(review);
+    product.numReviews = product.reviews.length;
+    product.rating =
+      product.reviews.reduce((a, item) => item.rating + a, 0) /
+      product.reviews.length;
+    await product.save();
+    res.status(201).json({ product });
+  } else {
+    res.status(404);
+    throw new Error('Product not found');
+  }
+});
+
 export {
   getProducts,
   getAllProducts,
@@ -252,4 +286,5 @@ export {
   createProduct,
   editProduct,
   getTopProducts,
+  createProductReview,
 };
