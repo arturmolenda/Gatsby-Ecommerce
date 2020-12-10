@@ -1,5 +1,3 @@
-// import React from "react"
-// import { Provider } from "react-redux"
 import {
   createStore as reduxCreateStore,
   combineReducers,
@@ -24,6 +22,7 @@ import {
   productUpdateReducer,
   productDetailsReducer,
   productTopRatedReducer,
+  productReviewCreateReducer,
 } from "./reducers/productReducers"
 import { cartReducer } from "./reducers/cartReducers"
 import {
@@ -58,6 +57,7 @@ const reducer = combineReducers({
   productImageUpload: productImageUploadReducer,
   productDetails: productDetailsReducer,
   productTopRated: productTopRatedReducer,
+  productReviewCreate: productReviewCreateReducer,
   cart: cartReducer,
   discountApply: discountApplyReducer,
   discountListAll: discountListAllReducer,
