@@ -98,7 +98,7 @@ const ProductReviews = ({ productData, newRatingCb }) => {
       setScore(null)
       setComment("")
       setAddReviewOpen(false)
-      newRatingCb(newProduct.rating)
+      newRatingCb(newProduct.rating, newProduct.reviews, newProduct.numReviews)
     }
   }, [success, newProduct])
 

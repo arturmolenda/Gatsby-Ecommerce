@@ -92,8 +92,8 @@ const Product = ({ id, location, previewProduct }) => {
     }
   }
 
-  const newRatingCb = rating => {
-    setProduct({ ...product, rating })
+  const newRatingCb = (rating, reviews, numReviews) => {
+    setProduct({ ...product, rating, reviews, numReviews })
   }
 
   console.log(backLink)
