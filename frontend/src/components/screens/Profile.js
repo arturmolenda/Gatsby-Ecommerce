@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react"
 import { Link, navigate } from "gatsby"
+import { Helmet } from "react-helmet"
 
 import { useDispatch, useSelector } from "react-redux"
 import { USER_UPDATE_RESET } from "../../redux/constants/userConstants"
+import { listMyOrders } from "../../redux/actions/orderActions"
 
 import {
   Button,
@@ -20,10 +22,9 @@ import {
 } from "@material-ui/core"
 import ClearIcon from "@material-ui/icons/Clear"
 import ShoppingBasketIcon from "@material-ui/icons/ShoppingBasket"
+import { Alert } from "@material-ui/lab"
 
 import UpdateUser from "../UpdateUser"
-import { Alert } from "@material-ui/lab"
-import { listMyOrders } from "../../redux/actions/orderActions"
 import Loader from "../Loader"
 
 const useStyles = makeStyles(() => ({
@@ -61,7 +62,6 @@ const Profile = () => {
     error,
   } = useSelector(state => state.orderListMy)
 
-  console.log(orders, page, totalRows, rowsSize)
   const classes = useStyles()
 
   useEffect(() => {
@@ -89,6 +89,7 @@ const Profile = () => {
 
   return (
     <>
+      <Helmet title="Profile" />
       {userInfo && (
         <Grid container spacing={2}>
           <Grid item md={3} sm={12} xs={12}>

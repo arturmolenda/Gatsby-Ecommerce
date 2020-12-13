@@ -1,5 +1,6 @@
 import React from "react"
 import { Link, navigate } from "gatsby"
+import { Helmet } from "react-helmet"
 
 import { useDispatch, useSelector } from "react-redux"
 import { addToCart, removeFromCart } from "../../redux/actions/cartActions"
@@ -63,108 +64,113 @@ const Cart = () => {
     navigate("/login?redirect=shipping")
   }
   return (
-    <div className={classes.cartContainer}>
-      <Typography variant="h1" style={{ margin: "18px 0" }}>
-        SHOPPING CART
-      </Typography>
-      <Grid container spacing={2} className={classes.productsTableFix}>
-        {cartItems.length !== 0 ? (
-          <>
-            <Grid item md={8} sm={12}>
-              <TableContainer component={Paper}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Image</TableCell>
-                      <TableCell align="left">Product</TableCell>
-                      <TableCell align="right">Price</TableCell>
-                      <TableCell align="right">Ammount</TableCell>
-                      <TableCell align="right"></TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {cartItems.map(item => (
-                      <TableRow key={item.product}>
-                        <TableCell style={{ width: 150, padding: 8 }}>
-                          <Link to={`/product/${item.product}?goBack=cart`}>
-                            <Image
-                              alt={item.name}
-                              filename={item.image}
-                              customStyle={{ borderRadius: 6 }}
-                            />
-                          </Link>
-                        </TableCell>
-                        <TableCell>
-                          <Link
-                            className="underline"
-                            to={`/product/${item.product}?backLink=cart`}
-                          >
-                            {item.name}
-                          </Link>
-                        </TableCell>
-                        <TableCell align="right">${item.price}</TableCell>
-                        <TableCell align="right">
-                          <QtySelect
-                            countInStock={item.countInStock}
-                            value={item.qty}
-                            changeHandle={e =>
-                              dispatch(addToCart(item.product, e.target.value))
-                            }
-                            loading={productLoading === item.product}
-                            customWidth={"50%"}
-                          />
-                        </TableCell>
-                        <TableCell align="right">
-                          <Button
-                            onClick={() =>
-                              dispatch(removeFromCart(item.product))
-                            }
-                          >
-                            <DeleteIcon />
-                          </Button>
-                        </TableCell>
+    <>
+      <Helmet title="Cart" />
+      <div className={classes.cartContainer}>
+        <Typography variant="h1" style={{ margin: "18px 0" }}>
+          SHOPPING CART
+        </Typography>
+        <Grid container spacing={2} className={classes.productsTableFix}>
+          {cartItems.length !== 0 ? (
+            <>
+              <Grid item md={8} sm={12}>
+                <TableContainer component={Paper}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Image</TableCell>
+                        <TableCell align="left">Product</TableCell>
+                        <TableCell align="right">Price</TableCell>
+                        <TableCell align="right">Ammount</TableCell>
+                        <TableCell align="right"></TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Grid>
-            <Grid item md={4} sm={12} xs={12}>
-              <PaymentCard
-                title={"TOTAL PRICE"}
-                price={price}
-                totalPrice={totalPrice}
-                loading={productLoading}
-                btnText={"GO TO CHECKOUT"}
-                btnHandle={checkoutHandle}
+                    </TableHead>
+                    <TableBody>
+                      {cartItems.map(item => (
+                        <TableRow key={item.product}>
+                          <TableCell style={{ width: 150, padding: 8 }}>
+                            <Link to={`/product/${item.product}?goBack=cart`}>
+                              <Image
+                                alt={item.name}
+                                filename={item.image}
+                                customStyle={{ borderRadius: 6 }}
+                              />
+                            </Link>
+                          </TableCell>
+                          <TableCell>
+                            <Link
+                              className="underline"
+                              to={`/product/${item.product}?backLink=cart`}
+                            >
+                              {item.name}
+                            </Link>
+                          </TableCell>
+                          <TableCell align="right">${item.price}</TableCell>
+                          <TableCell align="right">
+                            <QtySelect
+                              countInStock={item.countInStock}
+                              value={item.qty}
+                              changeHandle={e =>
+                                dispatch(
+                                  addToCart(item.product, e.target.value)
+                                )
+                              }
+                              loading={productLoading === item.product}
+                              customWidth={"50%"}
+                            />
+                          </TableCell>
+                          <TableCell align="right">
+                            <Button
+                              onClick={() =>
+                                dispatch(removeFromCart(item.product))
+                              }
+                            >
+                              <DeleteIcon />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Grid>
+              <Grid item md={4} sm={12} xs={12}>
+                <PaymentCard
+                  title={"TOTAL PRICE"}
+                  price={price}
+                  totalPrice={totalPrice}
+                  loading={productLoading}
+                  btnText={"GO TO CHECKOUT"}
+                  btnHandle={checkoutHandle}
+                />
+              </Grid>
+            </>
+          ) : (
+            <div className={classes.emptyContainer}>
+              <AddShoppingCartIcon
+                style={{ width: 100, height: 100, marginBottom: 20 }}
               />
-            </Grid>
-          </>
-        ) : (
-          <div className={classes.emptyContainer}>
-            <AddShoppingCartIcon
-              style={{ width: 100, height: 100, marginBottom: 20 }}
-            />
-            <Alert
-              severity="info"
-              variant="standard"
-              style={{ alignItems: "center", backgroundColor: "#c1e3fc" }}
-            >
-              Your shopping cart is empty, add something and come back again!
-            </Alert>
-            <Link to="/">
-              <Button
-                color="primary"
-                variant="contained"
-                style={{ marginTop: 20 }}
+              <Alert
+                severity="info"
+                variant="standard"
+                style={{ alignItems: "center", backgroundColor: "#c1e3fc" }}
               >
-                Browse products
-              </Button>
-            </Link>
-          </div>
-        )}
-      </Grid>
-    </div>
+                Your shopping cart is empty, add something and come back again!
+              </Alert>
+              <Link to="/">
+                <Button
+                  color="primary"
+                  variant="contained"
+                  style={{ marginTop: 20 }}
+                >
+                  Browse products
+                </Button>
+              </Link>
+            </div>
+          )}
+        </Grid>
+      </div>
+    </>
   )
 }
 

@@ -20,7 +20,7 @@ const getProducts = asyncHandler(async (req, res) => {
       throw new Error('Product not found');
     }
   } else {
-    const pageSize = 10;
+    const pageSize = 8;
     const page = Number(req.query.pageNumber) || 1;
     const keyword = req.query.keyword
       ? {

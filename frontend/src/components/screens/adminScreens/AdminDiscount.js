@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { Link, navigate } from "gatsby"
+import { Helmet } from "react-helmet"
 
 import { useDispatch, useSelector } from "react-redux"
 import {
@@ -27,6 +28,7 @@ import {
 } from "@material-ui/core"
 import ArrowBackIcon from "@material-ui/icons/ArrowBack"
 import { Alert } from "@material-ui/lab"
+
 import Loader from "../../Loader"
 
 const AdminDiscount = ({ id }) => {
@@ -134,6 +136,7 @@ const AdminDiscount = ({ id }) => {
 
   return (
     <>
+      <Helmet title={id ? "Edit Discount" : "Create Discount"} />
       <Link to={"/admin/discounts"}>
         <Button startIcon={<ArrowBackIcon />} style={{ marginBottom: 10 }}>
           Go back

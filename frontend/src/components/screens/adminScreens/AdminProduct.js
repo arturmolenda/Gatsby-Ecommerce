@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { Link, navigate } from "gatsby"
+import { Helmet } from "react-helmet"
 
 import { useDispatch, useSelector } from "react-redux"
 import {
@@ -9,19 +10,19 @@ import {
   updateProduct,
   uploadProductImage,
 } from "../../../redux/actions/productActions"
+import {
+  PRODUCT_CREATE_RESET,
+  PRODUCT_IMAGE_UPLOAD_RESET,
+} from "../../../redux/constants/productConstants"
 
 import { Button, Grid, makeStyles, Typography } from "@material-ui/core"
+import { Alert } from "@material-ui/lab"
 import ArrowBackIcon from "@material-ui/icons/ArrowBack"
 
 import ProductForm from "../../productForm/ProductForm"
 import ProductCard from "../../products/ProductCard"
 import Loader from "../../Loader"
 import Product from "../Product"
-import { Alert } from "@material-ui/lab"
-import {
-  PRODUCT_CREATE_RESET,
-  PRODUCT_IMAGE_UPLOAD_RESET,
-} from "../../../redux/constants/productConstants"
 
 const useStyles = makeStyles(theme => ({
   sampleProduct: {
@@ -259,6 +260,7 @@ const AdminProduct = ({ id }) => {
 
   return (
     <>
+      <Helmet title={id ? "Edit Product" : "Create Product"} />
       <Link to={"/admin/products"}>
         <Button startIcon={<ArrowBackIcon />} style={{ marginBottom: 10 }}>
           Go back

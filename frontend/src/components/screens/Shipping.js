@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { navigate } from "gatsby"
+import { Helmet } from "react-helmet"
 
 import { useDispatch, useSelector } from "react-redux"
 
@@ -14,16 +15,16 @@ const Shipping = ({ location }) => {
   const [country, setCountry] = useState("")
   const [submitted, setSubmitted] = useState(false)
 
-  const nextPage = location.search
-    ? `/${location.search.split("=")[1]}`
-    : "/payment"
-
   const dispatch = useDispatch()
 
   const { userInfo } = useSelector(state => state.userLogin)
   const { cartItems, shippingAddress } = useSelector(state => state.cart)
+
+  const nextPage = location.search
+    ? `/${location.search.split("=")[1]}`
+    : "/payment"
+
   useEffect(() => {
-    console.log(userInfo, cartItems)
     if (!userInfo) navigate("/")
     else if (cartItems.length === 0) navigate("/cart")
     if (shippingAddress && Object.keys(shippingAddress).length === 4) {
@@ -44,7 +45,8 @@ const Shipping = ({ location }) => {
   }
 
   return (
-    <div>
+    <>
+      <Helmet title="Shipping" />
       {userInfo && cartItems.length !== 0 && (
         <>
           <Steps activeStep={1} />
@@ -116,7 +118,7 @@ const Shipping = ({ location }) => {
           </Grid>
         </>
       )}
-    </div>
+    </>
   )
 }
 
