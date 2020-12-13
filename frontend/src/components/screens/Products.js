@@ -36,6 +36,7 @@ const Products = props => {
 
   const pageChangeHandle = (e, pageNum) => {
     if (keyword) navigate(`/search/${keyword}/page/${pageNum}`)
+    else if (pageNum === 1) navigate("/")
     else navigate(`/page/${pageNum}`)
   }
   return (
