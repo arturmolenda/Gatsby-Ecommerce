@@ -1,5 +1,4 @@
 import {
-  Button,
   Checkbox,
   FormControlLabel,
   makeStyles,
@@ -7,8 +6,11 @@ import {
   Typography,
 } from "@material-ui/core"
 import React from "react"
+import Loadable from "@loadable/component"
 import ImagesUpload from "./ImagesUpload"
 import LabelField from "./LabelField"
+
+const LoadableEditor = Loadable(() => import("./RichTextEditor"))
 
 const useStyles = makeStyles(() => ({
   header: {
@@ -32,7 +34,7 @@ const ProductForm = ({
   brand,
   brandChange,
   description,
-  descriptionChange,
+  setDescription,
   discount,
   setDiscount,
   labels,
@@ -122,15 +124,9 @@ const ProductForm = ({
         value={brand}
         onChange={brandChange}
       />
-      <TextField
-        required
-        type="text"
-        label="Description"
-        variant="filled"
-        margin="normal"
-        multiline
-        value={description}
-        onChange={descriptionChange}
+      <LoadableEditor
+        description={description}
+        setDescription={setDescription}
       />
       <Typography variant="h3" className={classes.header}>
         DISCOUNT
@@ -155,7 +151,11 @@ const ProductForm = ({
         }}
       />
 
-      <Typography variant="h3" className={classes.header}>
+      <Typography
+        variant="h3"
+        className={classes.header}
+        style={{ marginBottom: 5 }}
+      >
         LABELS
       </Typography>
       <LabelField labels={labels} setLabels={setLabels} />

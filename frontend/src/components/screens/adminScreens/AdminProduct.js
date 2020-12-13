@@ -319,7 +319,7 @@ const AdminProduct = ({ id }) => {
           <Grid container justify="center">
             <Grid item md={5} sm={8} xs={12}>
               <Typography variant="h1" align="center">
-                CREATE NEW PRODUCT
+                {id ? "EDIT PRODUCT" : "CREATE NEW PRODUCT"}
               </Typography>
               <form
                 onSubmit={submitHandle}
@@ -341,7 +341,7 @@ const AdminProduct = ({ id }) => {
                   discount={discount}
                   setDiscount={setDiscount}
                   description={description}
-                  descriptionChange={e => setDescription(e.target.value)}
+                  setDescription={setDescription}
                   labels={labels}
                   setLabels={setLabels}
                   showProduct={showProduct}
