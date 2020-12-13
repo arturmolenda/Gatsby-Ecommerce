@@ -39,11 +39,17 @@ const useStyles = makeStyles(theme => ({
   gridMobileFlex: {
     [theme.breakpoints.down("sm")]: {
       display: "flex",
+      marginTop: 15,
     },
   },
   imgContainer: {
     position: "relative",
     display: "grid",
+  },
+  imgDescription: {
+    position: "absolute",
+    left: 0,
+    bottom: -23,
   },
   productActions: {
     ["@media (min-width: 1024px)"]: {
@@ -212,6 +218,18 @@ const Product = ({ id, location, previewProduct }) => {
                       labels={product.labels}
                       discount={product.discount}
                     />
+                    <Typography
+                      variant="caption"
+                      className={classes.imgDescription}
+                    >
+                      {currentImage.description && (
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html: currentImage.description,
+                          }}
+                        />
+                      )}
+                    </Typography>
                   </div>
                 </Grid>
               </Grid>
@@ -284,7 +302,9 @@ const Product = ({ id, location, previewProduct }) => {
               </Grid>
               <Divider style={{ margin: "20px 0", width: "100%" }} />
               <div>
-                <Typography variant="body1">{product.description}</Typography>
+                <div
+                  dangerouslySetInnerHTML={{ __html: product.description }}
+                />
               </div>
             </Grid>
             <Snackbar
