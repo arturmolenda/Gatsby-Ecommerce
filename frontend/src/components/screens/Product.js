@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { Link } from "gatsby"
+import { Helmet } from "react-helmet"
 
 import { useDispatch, useSelector } from "react-redux"
 import { addToCart } from "../../redux/actions/cartActions"
@@ -102,9 +103,9 @@ const Product = ({ id, location, previewProduct }) => {
     setProduct({ ...product, rating, reviews, numReviews })
   }
 
-  console.log(backLink)
   return (
     <>
+      {id && !previewProduct && product && <Helmet title={product.name} />}
       {!previewProduct && (
         <Link to={backLink} replace>
           <Button startIcon={<ArrowBackIcon />} style={{ marginBottom: 10 }}>

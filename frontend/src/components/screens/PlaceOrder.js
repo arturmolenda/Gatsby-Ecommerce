@@ -1,8 +1,11 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { navigate, Link } from "gatsby"
+import { Helmet } from "react-helmet"
 
 import { useDispatch, useSelector } from "react-redux"
 import { applyDiscount } from "../../redux/actions/discountActions"
+import { createOrder } from "../../redux/actions/orderActions"
+import { ORDER_CREATE_RESET } from "../../redux/constants/orderConstants"
 
 import {
   Card,
@@ -10,7 +13,6 @@ import {
   Divider,
   Grid,
   makeStyles,
-  Paper,
   Table,
   TableBody,
   TableCell,
@@ -18,16 +20,13 @@ import {
   TableRow,
   Typography,
 } from "@material-ui/core"
+import { Alert } from "@material-ui/lab"
+import EditIcon from "@material-ui/icons/Edit"
+
 import Steps from "../Steps"
 import Image from "../Image"
-import EditIcon from "@material-ui/icons/Edit"
-import PaymentCard from "../PaymentCard"
-import { useEffect } from "react"
-import { createOrder } from "../../redux/actions/orderActions"
-import { Alert } from "@material-ui/lab"
-import { ORDER_CREATE_RESET } from "../../redux/constants/orderConstants"
-import { CART_DELETE_ITEMS } from "../../redux/constants/cartConstants"
 import CouponCard from "../CouponCard"
+import PaymentCard from "../PaymentCard"
 
 const useStyles = makeStyles(theme => ({
   divideContainers: {
@@ -132,6 +131,7 @@ const PlaceOrder = () => {
 
   return (
     <>
+      <Helmet title="Order" />
       <Container>
         <Steps activeStep={3} />
       </Container>

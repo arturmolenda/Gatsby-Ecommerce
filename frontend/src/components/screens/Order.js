@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { navigate, Link } from "gatsby"
+import { Helmet } from "react-helmet"
 
 import { useDispatch, useSelector } from "react-redux"
 import {
@@ -27,13 +28,15 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core"
+import { Alert } from "@material-ui/lab"
+import ArrowBackIcon from "@material-ui/icons/ArrowBack"
+
+import axios from "axios"
+import moment from "moment"
+
 import Image from "../Image"
 import PaymentCard from "../PaymentCard"
-import { Alert } from "@material-ui/lab"
-import axios from "axios"
 import Loader from "../Loader"
-
-import moment from "moment"
 
 const useStyles = makeStyles(theme => ({
   divideContainers: {
@@ -68,7 +71,6 @@ const Order = ({ id: orderId }) => {
   const { userInfo } = useSelector(state => state.userLogin)
   const { loading, order, error } = useSelector(state => state.orderDetails)
   const {
-    cartItems,
     shippingAddress: { address, city, postalCode, country },
     paymentMethod,
   } = useSelector(state => state.cart)
@@ -108,7 +110,6 @@ const Order = ({ id: orderId }) => {
 
   useEffect(() => {
     if (successShip) dispatch(getOrderDetails(orderId))
-    console.log(successPay)
   }, [successShip])
 
   useEffect(() => {
@@ -128,6 +129,14 @@ const Order = ({ id: orderId }) => {
 
   return (
     <>
+      <Helmet title={orderId ? `Order ${orderId}` : "Order"} />
+      {userInfo && userInfo.isAdmin && (
+        <Link to={"/admin/orders"}>
+          <Button startIcon={<ArrowBackIcon />} style={{ marginBottom: 10 }}>
+            Go back
+          </Button>
+        </Link>
+      )}
       {loading ? (
         <Loader />
       ) : error ? (

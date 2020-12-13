@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { Link, navigate } from "gatsby"
+import { Helmet } from "react-helmet"
+
 import { useDispatch, useSelector } from "react-redux"
 import { register } from "../../redux/actions/userActions"
 
@@ -97,9 +99,9 @@ const Login = ({ location }) => {
     } else setConfirmPasswordError("")
     setConfirmPassword(e.target.value)
   }
-  console.log(redirect, redirect === "/shipping")
   return (
     <>
+      <Helmet title="Register" />
       {redirect === "/shipping" && <Steps activeStep={0} />}
       <Grid container justify="center">
         <Grid item lg={4} md={6} sm={8} xs={8}>

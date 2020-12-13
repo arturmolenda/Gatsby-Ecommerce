@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { Link, navigate } from "gatsby"
+import { Helmet } from "react-helmet"
 
 import { useDispatch, useSelector } from "react-redux"
 import { login } from "../../redux/actions/userActions"
@@ -75,6 +76,7 @@ const Login = ({ location, productReviewLogin }) => {
   }
   return (
     <>
+      <Helmet title="Login" />
       {redirect === "/shipping" && <Steps activeStep={0} />}
       <Grid container justify="center">
         <Grid item {...gridProps}>

@@ -1,5 +1,6 @@
 import React, { useEffect } from "react"
 import { Link, navigate } from "gatsby"
+import { Helmet } from "react-helmet"
 
 import { useDispatch, useSelector } from "react-redux"
 import {
@@ -10,6 +11,7 @@ import {
 import { Button, Grid, Typography } from "@material-ui/core"
 import { Alert, Pagination } from "@material-ui/lab"
 import ArrowBackIcon from "@material-ui/icons/ArrowBack"
+
 import ProductCard from "../products/ProductCard"
 import ProductSkeleton from "../ProductSkeleton"
 import Carousel from "../products/Carousel"
@@ -40,66 +42,69 @@ const Products = props => {
     else navigate(`/page/${pageNum}`)
   }
   return (
-    <div
-      style={{
-        marginTop: topProducts && !topError && !keyword && !page && -30,
-      }}
-    >
-      {keyword && (
-        <Link to={"/"}>
-          <Button startIcon={<ArrowBackIcon />} style={{ marginBottom: 10 }}>
-            Browse all products
-          </Button>
-        </Link>
-      )}
+    <>
+      <Helmet title="Welcome to the Gatsby Store!" />
+      <div
+        style={{
+          marginTop: topProducts && !topError && !keyword && !page && -30,
+        }}
+      >
+        {keyword && (
+          <Link to={"/"}>
+            <Button startIcon={<ArrowBackIcon />} style={{ marginBottom: 10 }}>
+              Browse all products
+            </Button>
+          </Link>
+        )}
 
-      {topLoading ? (
-        <Loader contained />
-      ) : (
-        !topError &&
-        !keyword &&
-        !page && (
-          <Grid container spacing={3}>
-            <Grid item sm={12} xs={12}>
-              <Carousel products={topProducts} />
+        {topLoading ? (
+          <Loader contained />
+        ) : (
+          !topError &&
+          !keyword &&
+          !page && (
+            <Grid container spacing={3}>
+              <Grid item sm={12} xs={12}>
+                <Carousel products={topProducts} />
+              </Grid>
             </Grid>
-          </Grid>
-        )
-      )}
-      <Typography variant="h1">
-        {keyword ? "SHOWING SEARCH RESULTS" : "LATEST PRODUCTS"}
-      </Typography>
-      {loading ? (
-        <Grid container spacing={3}>
-          {[...Array(10).keys()].map(num => (
-            <Grid item xs={6} sm={4} md={3} key={num}>
-              <ProductSkeleton />
-            </Grid>
-          ))}
-        </Grid>
-      ) : error ? (
-        <Alert severity="error">{error}</Alert>
-      ) : (
-        <>
+          )
+        )}
+        <Typography variant="h1">
+          {keyword ? "SHOWING SEARCH RESULTS" : "LATEST PRODUCTS"}
+        </Typography>
+        {loading ? (
           <Grid container spacing={3}>
-            {products.length !== 0 &&
-              products.map(product => (
-                <Grid item xs={6} sm={4} md={3} key={product._id}>
-                  <ProductCard key={product._id} product={product} />
-                </Grid>
-              ))}
+            {[...Array(10).keys()].map(num => (
+              <Grid item xs={6} sm={4} md={3} key={num}>
+                <ProductSkeleton />
+              </Grid>
+            ))}
           </Grid>
-          {pages > 1 && (
-            <Pagination
-              count={pages}
-              page={currentPage}
-              onChange={pageChangeHandle}
-              style={{ marginTop: 20 }}
-            />
-          )}
-        </>
-      )}
-    </div>
+        ) : error ? (
+          <Alert severity="error">{error}</Alert>
+        ) : (
+          <>
+            <Grid container spacing={3}>
+              {products.length !== 0 &&
+                products.map(product => (
+                  <Grid item xs={6} sm={4} md={3} key={product._id}>
+                    <ProductCard key={product._id} product={product} />
+                  </Grid>
+                ))}
+            </Grid>
+            {pages > 1 && (
+              <Pagination
+                count={pages}
+                page={currentPage}
+                onChange={pageChangeHandle}
+                style={{ marginTop: 20 }}
+              />
+            )}
+          </>
+        )}
+      </div>
+    </>
   )
 }
 
