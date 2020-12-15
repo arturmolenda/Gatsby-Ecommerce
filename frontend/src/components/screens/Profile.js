@@ -69,15 +69,16 @@ const Profile = () => {
     return () => {
       dispatch({ type: USER_UPDATE_RESET })
     }
-  }, [userInfo])
+  }, [dispatch, userInfo])
 
   useEffect(() => {
-    if (!orders || (orders.length === 0 && !success)) {
+    if (!orders || (orders && orders.length === 0 && !success)) {
       if (page && totalRows) {
         dispatch(listMyOrders(page, rowsPerPage))
       } else dispatch(listMyOrders())
     }
-  }, [])
+    // eslint-disable-next-line
+  }, [dispatch])
 
   const changePageHandle = (e, newPage) => {
     dispatch(listMyOrders(newPage, rowsPerPage))
@@ -103,7 +104,7 @@ const Profile = () => {
               MY ORDERS
             </Typography>
             {error && <Alert severity="error">{error}</Alert>}
-            {(loading || orders.length > 0) && (
+            {(loading || (orders && orders.length > 0)) && (
               <TableContainer component={Paper}>
                 <Table>
                   <TableHead>

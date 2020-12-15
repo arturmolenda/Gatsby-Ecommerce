@@ -92,6 +92,7 @@ const Products = () => {
         dispatch(listAllProducts(page, rowsPerPage, keyword))
       } else dispatch(listAllProducts())
     }
+    // eslint-disable-next-line
   }, [userInfo, deleteSuccess])
 
   useEffect(() => {
@@ -99,6 +100,7 @@ const Products = () => {
       dispatch({ type: PRODUCT_LIST_ALL_RESET })
       resetDeleteAlert()
     }
+    // eslint-disable-next-line
   }, [])
   const deleteHandle = () => {
     resetDeleteAlert()
@@ -250,9 +252,9 @@ const Products = () => {
               <TablePagination
                 rowsPerPageOptions={[5, 15, 50]}
                 component="div"
-                count={totalRows}
-                rowsPerPage={rowsSize}
-                page={page}
+                count={totalRows || 0}
+                rowsPerPage={rowsSize || 5}
+                page={page || 0}
                 onChangePage={changePageHandle}
                 onChangeRowsPerPage={changeRowsPerPageHandle}
               />

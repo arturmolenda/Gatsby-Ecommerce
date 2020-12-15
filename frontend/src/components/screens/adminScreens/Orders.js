@@ -81,6 +81,7 @@ const Orders = () => {
         dispatch(listAllOrders(page, rowsPerPage, keyword))
       } else dispatch(listAllOrders())
     }
+    // eslint-disable-next-line
   }, [userInfo, deleteSuccess])
 
   useEffect(() => {
@@ -88,6 +89,7 @@ const Orders = () => {
       dispatch({ type: ORDER_LIST_ALL_RESET })
       resetDeleteAlert()
     }
+    // eslint-disable-next-line
   }, [])
 
   const deleteHandle = () => {
@@ -219,9 +221,9 @@ const Orders = () => {
               <TablePagination
                 rowsPerPageOptions={[5, 15, 50]}
                 component="div"
-                count={totalRows}
-                rowsPerPage={rowsSize}
-                page={page}
+                count={totalRows || 0}
+                rowsPerPage={rowsSize || 5}
+                page={page || 0}
                 onChangePage={changePageHandle}
                 onChangeRowsPerPage={changeRowsPerPageHandle}
               />

@@ -72,11 +72,9 @@ const AdminProduct = ({ id }) => {
   const { userInfo } = useSelector(state => state.userLogin)
   const { loading, product, error } = useSelector(state => state.productDetails)
 
-  const {
-    loading: listProductsLoading,
-    products,
-    success: listProductsSuccess,
-  } = useSelector(state => state.productList)
+  const { loading: listProductsLoading, products } = useSelector(
+    state => state.productList
+  )
 
   const {
     loading: uploadLoading,
@@ -159,6 +157,7 @@ const AdminProduct = ({ id }) => {
       dispatch(listProducts())
     } else if (product && id && product._id !== id)
       dispatch(getProductDetails(id))
+    // eslint-disable-next-line
   }, [userInfo, id, product])
 
   useEffect(() => {
@@ -182,6 +181,7 @@ const AdminProduct = ({ id }) => {
         resetReducers()
       }
     }
+    // eslint-disable-next-line
   }, [createSuccess, updateSuccess, uploadSuccess])
 
   useEffect(() => {
@@ -215,6 +215,7 @@ const AdminProduct = ({ id }) => {
         })
       }
     }
+    // eslint-disable-next-line
   }, [product, id])
 
   const submitHandle = async e => {

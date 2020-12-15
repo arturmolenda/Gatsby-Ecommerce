@@ -16,15 +16,12 @@ import {
   ORDER_LIST_ALL_REQUEST,
   ORDER_LIST_ALL_SUCCESS,
   ORDER_LIST_ALL_FAIL,
-  ORDER_LIST_ALL_RESET,
   ORDER_SHIP_REQUEST,
   ORDER_SHIP_SUCCESS,
   ORDER_SHIP_FAIL,
-  ORDER_SHIP_RESET,
   ORDER_DELETE_REQUEST,
   ORDER_DELETE_SUCCESS,
   ORDER_DELETE_FAIL,
-  ORDER_DELETE_RESET,
 } from "../constants/orderConstants"
 
 export const createOrder = order => async (dispatch, getState) => {

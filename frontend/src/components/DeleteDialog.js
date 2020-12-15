@@ -17,7 +17,7 @@ const DeleteDialog = ({
   actionBtn = "Delete",
 }) => {
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={Boolean(open)} onClose={handleClose}>
       <div style={{ minWidth: 300 }}>
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>

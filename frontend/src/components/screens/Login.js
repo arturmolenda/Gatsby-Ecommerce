@@ -40,10 +40,11 @@ const Login = ({ location, productReviewLogin }) => {
 
   useEffect(() => {
     if (userInfo && !productReviewLogin) navigate(redirect)
-  }, [dispatch, userInfo, productReviewLogin])
+  }, [dispatch, userInfo, productReviewLogin, redirect])
 
   const validate = () => {
     let returnVal = true
+    // eslint-disable-next-line
     const regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     if (!regex.test(email.toLowerCase())) {
       returnVal = false

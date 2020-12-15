@@ -53,6 +53,7 @@ const useStyles = makeStyles(theme => ({
     bottom: -23,
   },
   productActions: {
+    // eslint-disable-next-line
     ["@media (min-width: 1024px)"]: {
       marginLeft: "8%",
     },
@@ -61,6 +62,11 @@ const useStyles = makeStyles(theme => ({
     marginTop: 40,
     "& button": {
       marginTop: "10px",
+    },
+  },
+  htmlDescription: {
+    "& a": {
+      color: "#222222",
     },
   },
 }))
@@ -86,6 +92,7 @@ const Product = ({ id, location, previewProduct }) => {
       setProduct(currentProduct)
       setCurrentImage(currentProduct.images[0])
     } else if (!loading) dispatch(getProductDetails(id))
+    // eslint-disable-next-line
   }, [dispatch, currentProduct, previewProduct, id])
 
   const hoverHandle = imgObj => {
@@ -140,6 +147,7 @@ const Product = ({ id, location, previewProduct }) => {
                   <div className={classes.gridMobileFlex}>
                     {product.images.length > 1 &&
                       product.images.map((imgObj, index) => (
+                        // eslint-disable-next-line
                         <div
                           onMouseEnter={() => hoverHandle(imgObj)}
                           className={classes.imageMiniature}
@@ -160,6 +168,7 @@ const Product = ({ id, location, previewProduct }) => {
                               />
                             ) : (
                               <img
+                                alt="Preview"
                                 src={imgObj.blob ? imgObj.blob : imgObj.image}
                                 style={{ width: "100%", display: "flex" }}
                               />
@@ -195,6 +204,7 @@ const Product = ({ id, location, previewProduct }) => {
                         />
                       ) : (
                         <img
+                          alt="Preview"
                           src={
                             currentImage.blob
                               ? currentImage.blob
@@ -225,6 +235,7 @@ const Product = ({ id, location, previewProduct }) => {
                     >
                       {currentImage.description && (
                         <div
+                          className={classes.htmlDescription}
                           dangerouslySetInnerHTML={{
                             __html: currentImage.description,
                           }}

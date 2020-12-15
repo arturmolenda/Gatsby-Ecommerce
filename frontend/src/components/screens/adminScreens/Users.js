@@ -105,6 +105,7 @@ const Users = () => {
       if (page && totalRows && keyword) {
         dispatch(listAllUsers(page, rowsPerPage, keyword))
       } else dispatch(listAllUsers())
+    // eslint-disable-next-line
   }, [userInfo, updateSuccess, deleteSuccess])
 
   useEffect(() => {
@@ -112,6 +113,7 @@ const Users = () => {
       dispatch({ type: USER_LIST_ALL_RESET })
       resetAlerts()
     }
+    // eslint-disable-next-line
   }, [])
 
   const changeHandle = (e, i) => {
@@ -201,7 +203,10 @@ const Users = () => {
                       {users &&
                         users.length !== 0 &&
                         users.map((user, i) => (
-                          <TableRow className={classes.tableBackground}>
+                          <TableRow
+                            key={user._id}
+                            className={classes.tableBackground}
+                          >
                             <TableCell>{user._id}</TableCell>
                             <TableCell>{user.name}</TableCell>
                             <TableCell>{user.email}</TableCell>
@@ -279,9 +284,9 @@ const Users = () => {
                   <TablePagination
                     rowsPerPageOptions={[5, 15, 50]}
                     component="div"
-                    count={totalRows}
-                    rowsPerPage={rowsSize}
-                    page={page}
+                    count={totalRows || 0}
+                    rowsPerPage={rowsSize || 5}
+                    page={page || 0}
                     onChangePage={changePageHandle}
                     onChangeRowsPerPage={changeRowsPerPageHandle}
                   />

@@ -91,6 +91,7 @@ const AdminDiscount = ({ id }) => {
       } else if (createSuccess)
         navigate(`/admin/discounts/edit/${createSuccess}`)
     }
+    // eslint-disable-next-line
   }, [createSuccess, updateSuccess, id])
 
   useEffect(() => {
@@ -98,6 +99,7 @@ const AdminDiscount = ({ id }) => {
       dispatch({ type: DISCOUNT_DETAILS_RESET })
       resetReducers()
     }
+    // eslint-disable-next-line
   }, [])
 
   const submitHandle = async e => {

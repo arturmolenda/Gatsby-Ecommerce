@@ -95,6 +95,7 @@ const Discounts = () => {
         dispatch(listAllDiscounts(page, rowsPerPage, keyword))
       } else dispatch(listAllDiscounts())
     }
+    // eslint-disable-next-line
   }, [userInfo, deleteSuccess])
 
   useEffect(() => {
@@ -102,6 +103,7 @@ const Discounts = () => {
       dispatch({ type: DISCOUNT_LIST_ALL_RESET })
       resetDeleteAlert()
     }
+    // eslint-disable-next-line
   }, [])
   const deleteHandle = () => {
     resetDeleteAlert()
@@ -247,9 +249,9 @@ const Discounts = () => {
               <TablePagination
                 rowsPerPageOptions={[5, 15, 50]}
                 component="div"
-                count={totalRows}
-                rowsPerPage={rowsSize}
-                page={page}
+                count={totalRows || 0}
+                rowsPerPage={rowsSize || 5}
+                page={page || 0}
                 onChangePage={changePageHandle}
                 onChangeRowsPerPage={changeRowsPerPageHandle}
               />
