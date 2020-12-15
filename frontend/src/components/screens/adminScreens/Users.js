@@ -219,7 +219,10 @@ const Users = () => {
                                     : user.isAdmin
                                 }
                                 onChange={e => changeHandle(e, i)}
-                                disabled={user._id === userInfo._id}
+                                disabled={
+                                  user._id === userInfo._id ||
+                                  user.email === "admin@example.com"
+                                }
                               />
                             </TableCell>
                             <TableCell>
@@ -260,7 +263,8 @@ const Users = () => {
                                   size="small"
                                   disabled={
                                     user._id === userInfo._id ||
-                                    deleteLoading === user._id
+                                    deleteLoading === user._id ||
+                                    user.email === "admin@example.com"
                                   }
                                   onClick={() => setUserToDelete(user._id)}
                                 >

@@ -27,7 +27,7 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
-const UpdateUser = () => {
+const UpdateUser = ({ user }) => {
   const [name, setName] = useState("")
   const [nameError, setNameError] = useState("")
   const [email, setEmail] = useState("")
@@ -212,7 +212,7 @@ const UpdateUser = () => {
           variant="contained"
           style={{ marginTop: 10, alignSelf: "flex-start" }}
           size="large"
-          disabled={loading}
+          disabled={loading || (user && user.email === "admin@example.com")}
         >
           Update
           {loading && <Loader button />}
