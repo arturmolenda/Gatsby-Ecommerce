@@ -334,7 +334,7 @@ const ProductReviews = ({ productData, newRatingCb }) => {
                       <Typography variant="caption">
                         Reviewed at: {moment(review.createdAt).format("L")}
                       </Typography>
-                      <Rating rating={product.rating} color={"#1a1a1a"} />
+                      <Rating rating={review.rating} color={"#1a1a1a"} />
                       <Typography variant="body1">{review.comment}</Typography>
                     </div>
                     <div style={{ minWidth: 150, maxWidth: 150 }}>
