@@ -8,8 +8,9 @@ const useStyles = makeStyles(theme => ({
   container: {
     marginTop: 15,
     position: "relative",
-    maxWidth: "100vw",
-    overflowX: "hidden",
+    [theme.breakpoints.down("xs")]: {
+      overflow: "auto",
+    },
     "& .ck-editor__editable_inline": {
       minHeight: 100,
       backgroundColor: "rgb(0 0 0 / 10%) !important",
@@ -48,6 +49,11 @@ const useStyles = makeStyles(theme => ({
 const RichTextEditor = ({ description, setDescription }) => {
   const [isFocused, setIsFocused] = useState(false)
   const classes = useStyles()
+
+  const focusInputField = () => {
+    document.getElementsByClassName("ck-editor__main")[0].click()
+  }
+
   return (
     <div className={classes.container}>
       <CKEditor
@@ -62,6 +68,8 @@ const RichTextEditor = ({ description, setDescription }) => {
             "link",
             "numberedList",
             "bulletedList",
+            "alignment",
+            "insertTable",
             "|",
             "undo",
             "redo",
@@ -81,6 +89,7 @@ const RichTextEditor = ({ description, setDescription }) => {
         className={`${classes.inputLabel} ${
           (isFocused || description !== "") && classes.inputLabelFocused
         }`}
+        onClick={focusInputField}
       >
         Description
       </InputLabel>
