@@ -12,6 +12,7 @@ import {
 } from "../../../redux/actions/productActions"
 import {
   PRODUCT_CREATE_RESET,
+  PRODUCT_DETAILS_RESET,
   PRODUCT_IMAGE_UPLOAD_RESET,
 } from "../../../redux/constants/productConstants"
 
@@ -165,10 +166,10 @@ const AdminProduct = ({ id }) => {
       if (formData.length === 0) {
         resetReducers()
         dispatch(getProductDetails(id))
-        if (!id) navigate(`/admin/products/edit/${createdProduct}`)
+        if (!id && createdProduct)
+          navigate(`/admin/products/edit/${createdProduct}`)
       } else {
         dispatch(uploadProductImage(formData))
-        resetReducers()
         setFormData([])
       }
     }
@@ -183,6 +184,14 @@ const AdminProduct = ({ id }) => {
     }
     // eslint-disable-next-line
   }, [createSuccess, updateSuccess, uploadSuccess])
+
+  useEffect(() => {
+    return () => {
+      resetReducers()
+      dispatch({ type: PRODUCT_DETAILS_RESET })
+    }
+    // eslint-disable-next-line
+  }, [])
 
   useEffect(() => {
     if (id && product && product._id === id) {
