@@ -5,6 +5,7 @@ import fs from 'fs';
 import FileType from 'file-type';
 import fetch from 'node-fetch';
 import { v4 as uuidv4 } from 'uuid';
+import products, { mainImages } from '../data/products.js';
 
 // @desc    Get products
 // @route   GET /api/products?id=&pageNumber=&keyword=
@@ -74,16 +75,18 @@ const deleteProduct = asyncHandler(async (req, res) => {
     const __dirname = path.resolve();
     if (product.images.length !== 0) {
       product.images.map((img) => {
-        fs.unlink(
-          path.join(__dirname, `/frontend/public/images/${img.image}`),
-          (err) => {
-            if (err) {
-              console.error(err);
-              res.json(500);
-              throw new Error('Deleting product failed');
+        if (!mainImages.includes(img.image)) {
+          fs.unlink(
+            path.join(__dirname, `/frontend/public/images/${img.image}`),
+            (err) => {
+              if (err) {
+                console.error(err);
+                res.json(500);
+                throw new Error('Deleting product failed');
+              }
             }
-          }
-        );
+          );
+        }
       });
     }
     res.json({ message: 'Product removed' });
@@ -280,6 +283,25 @@ const createProductReview = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc   Reset Products
+// @route  POST /api/products/reset
+// @access Private
+const resetProducts = asyncHandler(async (req, res) => {
+  try {
+    await Product.deleteMany();
+
+    const sampleProducts = products.map((product) => {
+      return { ...product };
+    });
+    await Product.insertMany(sampleProducts);
+    console.log('Data Reset!');
+    res.status(200).json({ message: 'Data Reset!' });
+  } catch (error) {
+    res.status(500);
+    throw new Error(error);
+  }
+});
+
 export {
   getProducts,
   getAllProducts,
@@ -288,4 +310,5 @@ export {
   editProduct,
   getTopProducts,
   createProductReview,
+  resetProducts,
 };
