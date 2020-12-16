@@ -26,6 +26,8 @@ import { Alert } from "@material-ui/lab"
 
 import UpdateUser from "../UpdateUser"
 import Loader from "../Loader"
+import { resetProducts } from "../../redux/actions/productActions"
+import { PRODUCT_RESET_RESET } from "../../redux/constants/productConstants"
 
 const useStyles = makeStyles(() => ({
   header: {
@@ -46,12 +48,27 @@ const useStyles = makeStyles(() => ({
     width: "100%",
     padding: 20,
   },
+  resetButton: {
+    marginTop: 30,
+    display: "flex",
+    justifyContent: "center",
+    flexDirection: "column",
+    alignItems: "center",
+    "& button": {
+      marginTop: 10,
+    },
+  },
 }))
 
 const Profile = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5)
   const dispatch = useDispatch()
   const { userInfo } = useSelector(state => state.userLogin)
+  const {
+    loading: loadingReset,
+    success: successReset,
+    error: errorReset,
+  } = useSelector(state => state.productReset)
   const {
     loading,
     orders,
@@ -68,6 +85,7 @@ const Profile = () => {
     if (!userInfo) navigate("/login")
     return () => {
       dispatch({ type: USER_UPDATE_RESET })
+      dispatch({ type: PRODUCT_RESET_RESET })
     }
   }, [dispatch, userInfo])
 
@@ -97,7 +115,29 @@ const Profile = () => {
             <Typography variant="h2" className={classes.header}>
               UPDATE PROFILE
             </Typography>
-            <UpdateUser />
+            <UpdateUser user={userInfo} />
+            <div className={classes.resetButton}>
+              <Alert severity="warning">
+                If products have weird images or names or are deleted then feel
+                free to reset them, but don't abuse this button since products
+                db is shared among users
+              </Alert>
+              {errorReset && <Alert severity="error">{error}</Alert>}
+              {successReset && (
+                <Alert severity="success" style={{ marginTop: 10 }}>
+                  Products reset successfully!
+                </Alert>
+              )}
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={loadingReset}
+                onClick={() => dispatch(resetProducts())}
+              >
+                Reset Products
+                {loadingReset && <Loader button />}
+              </Button>
+            </div>
           </Grid>
           <Grid item md={9} sm={12} xs={12}>
             <Typography variant="h2" className={classes.header}>
