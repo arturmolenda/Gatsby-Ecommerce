@@ -89,7 +89,7 @@ const PlaceOrder = () => {
       dispatch({ type: ORDER_CREATE_RESET })
       navigate(`/order/${order._id}`)
     }
-  }, [success, order])
+  }, [dispatch, success, order])
 
   const applyCouponHandle = () => {
     dispatch(applyDiscount(coupon, totalPrice))

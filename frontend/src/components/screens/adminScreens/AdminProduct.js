@@ -12,6 +12,7 @@ import {
 } from "../../../redux/actions/productActions"
 import {
   PRODUCT_CREATE_RESET,
+  PRODUCT_DETAILS_RESET,
   PRODUCT_IMAGE_UPLOAD_RESET,
 } from "../../../redux/constants/productConstants"
 
@@ -72,11 +73,9 @@ const AdminProduct = ({ id }) => {
   const { userInfo } = useSelector(state => state.userLogin)
   const { loading, product, error } = useSelector(state => state.productDetails)
 
-  const {
-    loading: listProductsLoading,
-    products,
-    success: listProductsSuccess,
-  } = useSelector(state => state.productList)
+  const { loading: listProductsLoading, products } = useSelector(
+    state => state.productList
+  )
 
   const {
     loading: uploadLoading,
@@ -159,6 +158,7 @@ const AdminProduct = ({ id }) => {
       dispatch(listProducts())
     } else if (product && id && product._id !== id)
       dispatch(getProductDetails(id))
+    // eslint-disable-next-line
   }, [userInfo, id, product])
 
   useEffect(() => {
@@ -166,10 +166,10 @@ const AdminProduct = ({ id }) => {
       if (formData.length === 0) {
         resetReducers()
         dispatch(getProductDetails(id))
-        if (!id) navigate(`/admin/products/edit/${createdProduct}`)
+        if (!id && createdProduct)
+          navigate(`/admin/products/edit/${createdProduct}`)
       } else {
         dispatch(uploadProductImage(formData))
-        resetReducers()
         setFormData([])
       }
     }
@@ -182,7 +182,16 @@ const AdminProduct = ({ id }) => {
         resetReducers()
       }
     }
+    // eslint-disable-next-line
   }, [createSuccess, updateSuccess, uploadSuccess])
+
+  useEffect(() => {
+    return () => {
+      resetReducers()
+      dispatch({ type: PRODUCT_DETAILS_RESET })
+    }
+    // eslint-disable-next-line
+  }, [])
 
   useEffect(() => {
     if (id && product && product._id === id) {
@@ -215,6 +224,7 @@ const AdminProduct = ({ id }) => {
         })
       }
     }
+    // eslint-disable-next-line
   }, [product, id])
 
   const submitHandle = async e => {

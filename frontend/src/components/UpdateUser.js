@@ -11,14 +11,11 @@ const useStyles = makeStyles(theme => ({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: theme.palette.primary.main,
-    padding: "5px 0",
-    color: "#cacaca",
     marginBottom: 10,
-    "& p": {
+    color: "#cacaca",
+    "& button": {
       margin: 0,
-      cursor: "pointer",
-      fontSize: ".9rem",
-      fontWeight: 600,
+      color: "#cacaca",
       "&:hover": {
         color: "#fff",
       },
@@ -30,7 +27,7 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
-const UpdateUser = () => {
+const UpdateUser = ({ user }) => {
   const [name, setName] = useState("")
   const [nameError, setNameError] = useState("")
   const [email, setEmail] = useState("")
@@ -58,6 +55,7 @@ const UpdateUser = () => {
   const validate = () => {
     let isValid = true
     if (details) {
+      // eslint-disable-next-line
       const regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
       if (!regex.test(email.toLowerCase())) {
         isValid = false
@@ -121,19 +119,22 @@ const UpdateUser = () => {
 
   return (
     <div>
+      {/* eslint-disable-next-line */}
       <Breadcrumbs className={classes.breadcrumbs}>
-        <p
+        <Button
+          disableRipple
           onClick={() => setDetails(true)}
           style={{ color: details && "#fff" }}
         >
           Details
-        </p>
-        <p
+        </Button>
+        <Button
+          disableRipple
           onClick={() => setDetails(false)}
           style={{ color: !details && "#fff" }}
         >
           Password
-        </p>
+        </Button>
       </Breadcrumbs>
       {error && <Alert severity="error">{error}</Alert>}
       {success && <Alert severity="success">Profile details updated!</Alert>}
@@ -211,7 +212,7 @@ const UpdateUser = () => {
           variant="contained"
           style={{ marginTop: 10, alignSelf: "flex-start" }}
           size="large"
-          disabled={loading}
+          disabled={loading || (user && user.email === "admin@example.com")}
         >
           Update
           {loading && <Loader button />}

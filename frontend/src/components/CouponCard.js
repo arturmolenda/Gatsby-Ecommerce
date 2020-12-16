@@ -53,6 +53,7 @@ const CouponCard = ({
   const classes = useStyles()
   return (
     <Card className={classes.couponContainer}>
+      {/* eslint-disable-next-line */}
       <div
         className={classes.expandContainer}
         onClick={() => setExpanded(!expanded)}

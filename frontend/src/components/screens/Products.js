@@ -75,7 +75,7 @@ const Products = props => {
         </Typography>
         {loading ? (
           <Grid container spacing={3}>
-            {[...Array(10).keys()].map(num => (
+            {[...Array(8).keys()].map(num => (
               <Grid item xs={6} sm={4} md={3} key={num}>
                 <ProductSkeleton />
               </Grid>

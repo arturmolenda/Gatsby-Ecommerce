@@ -143,16 +143,24 @@ const updateDiscount = asyncHandler(async (req, res) => {
       onePerUser,
       isActive,
     } = req.body;
-    discount.code = code;
-    discount.isPercent = isPercent;
-    discount.minPrice = minPrice;
-    discount.amount = amount;
-    discount.expireDate = expireDate;
-    discount.couponsAmount = couponsAmount;
-    discount.onePerUser = onePerUser;
-    discount.isActive = isActive;
-    await discount.save();
-    res.json(discount);
+    const discountExists =
+      code === discount.code ? false : await Discount.findOne({ code });
+    if (!discountExists) {
+      discount.user = req.user._id;
+      discount.code = code;
+      discount.isPercent = isPercent;
+      discount.minPrice = minPrice;
+      discount.amount = amount;
+      discount.expireDate = expireDate;
+      discount.couponsAmount = couponsAmount;
+      discount.onePerUser = onePerUser;
+      discount.isActive = isActive;
+      await discount.save();
+      res.json(discount);
+    } else {
+      res.status(500);
+      throw new Error('Discount with this code already exists');
+    }
   } else {
     res.status(404);
     throw new Error('Discount not found');

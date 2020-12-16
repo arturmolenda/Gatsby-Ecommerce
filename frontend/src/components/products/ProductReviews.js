@@ -100,6 +100,7 @@ const ProductReviews = ({ productData, newRatingCb }) => {
       setAddReviewOpen(false)
       newRatingCb(newProduct.rating, newProduct.reviews, newProduct.numReviews)
     }
+    // eslint-disable-next-line
   }, [success, newProduct])
 
   useEffect(() => {
@@ -111,6 +112,7 @@ const ProductReviews = ({ productData, newRatingCb }) => {
       if (isReviewed) setProduct({ ...productData, isReviewed: true })
       else setProduct(productData)
     } else setProduct(productData)
+    // eslint-disable-next-line
   }, [userInfo])
 
   const reviewChange = e => {
@@ -332,7 +334,7 @@ const ProductReviews = ({ productData, newRatingCb }) => {
                       <Typography variant="caption">
                         Reviewed at: {moment(review.createdAt).format("L")}
                       </Typography>
-                      <Rating rating={product.rating} color={"#1a1a1a"} />
+                      <Rating rating={review.rating} color={"#1a1a1a"} />
                       <Typography variant="body1">{review.comment}</Typography>
                     </div>
                     <div style={{ minWidth: 150, maxWidth: 150 }}>

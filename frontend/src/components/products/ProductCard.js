@@ -48,6 +48,7 @@ const ProductCard = ({ product, disableLink, sampleProduct }) => {
                     />
                   ) : (
                     <img
+                      alt="Preview"
                       src={
                         product.images[0].blob
                           ? product.images[0].blob

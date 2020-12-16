@@ -143,7 +143,6 @@ const ProductForm = ({
         label="Discount expire date"
         variant="filled"
         type="date"
-        disablePast
         value={discount.expireDate}
         onChange={e => updateDiscount(e, "expireDate")}
         InputLabelProps={{

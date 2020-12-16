@@ -106,10 +106,12 @@ const Order = ({ id: orderId }) => {
         setSdkReady(true)
       }
     }
+    // eslint-disable-next-line
   }, [userInfo, order, successPay])
 
   useEffect(() => {
     if (successShip) dispatch(getOrderDetails(orderId))
+    // eslint-disable-next-line
   }, [successShip])
 
   useEffect(() => {
@@ -117,6 +119,7 @@ const Order = ({ id: orderId }) => {
       dispatch({ type: ORDER_PAY_RESET })
       dispatch({ type: ORDER_DETAILS_RESET })
     }
+    // eslint-disable-next-line
   }, [])
 
   const successPaymentHandle = paymentResult => {
@@ -188,6 +191,7 @@ const Order = ({ id: orderId }) => {
                             <a
                               href={order.tracking}
                               target="_blank"
+                              rel="noreferrer"
                               style={{ color: "#000", fontWeight: 600 }}
                               className="underline"
                             >

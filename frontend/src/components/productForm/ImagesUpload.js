@@ -181,7 +181,6 @@ const ImagesUpload = ({ images, setImages }) => {
         variant="contained"
         onClick={addImage}
         startIcon={<AddIcon />}
-        error
       >
         Add Image
       </Button>

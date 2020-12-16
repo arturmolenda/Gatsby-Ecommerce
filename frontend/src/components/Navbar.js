@@ -161,15 +161,6 @@ const Navbar = () => {
                 <Popper
                   anchorEl={anchorEl}
                   open={Boolean(anchorEl)}
-                  getContentAnchorEl={null}
-                  anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "left",
-                  }}
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "left",
-                  }}
                   style={{ zIndex: 1 }}
                 >
                   <ClickAwayListener onClickAway={() => setAnchorEl(null)}>
@@ -197,15 +188,6 @@ const Navbar = () => {
       <Popper
         anchorEl={adminAnchorEl}
         open={Boolean(adminAnchorEl)}
-        getContentAnchorEl={null}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "left",
-        }}
         style={{ zIndex: 1 }}
       >
         <ClickAwayListener onClickAway={() => setAdminAnchorEl(null)}>

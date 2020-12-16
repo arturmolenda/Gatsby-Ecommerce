@@ -15,6 +15,7 @@ import Rating from "../Rating"
 const useStyles = makeStyles(theme => ({
   imageContainer: {
     position: "relative",
+    outline: "none",
   },
   productDetails: {
     position: "absolute",
@@ -57,7 +58,6 @@ const Carousel = ({ products }) => {
         autoplaySoeed={4000}
         duration={80}
         accessibility
-        pauseOnHover
         beforeChange={() => setDragging(true)}
         afterChange={() => setDragging(false)}
         prevArrow={
@@ -74,7 +74,12 @@ const Carousel = ({ products }) => {
       >
         {products.map(product => (
           <div key={product._id} className={classes.imageContainer}>
-            <Image alt={product.name} filename={product.images[0].image} />
+            <Image
+              alt={product.name}
+              filename={product.images[0].image}
+              customStyle={{ userSelect: "none" }}
+              onMouseDown={e => e.preventDefault()}
+            />
             <ProductLabels
               labels={product.labels}
               discount={product.discount}
@@ -87,7 +92,10 @@ const Carousel = ({ products }) => {
               className={classes.productDetails}
               style={{ cursor: "pointer" }}
             >
-              <div onClickCapture={e => navigateHandle(e, product._id)}>
+              <div
+                onClickCapture={e => navigateHandle(e, product._id)}
+                style={{ userSelect: "none" }}
+              >
                 <Typography variant="caption" style={{ fontSize: "1.25em" }}>
                   {product.brand}
                 </Typography>
