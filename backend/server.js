@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
 import productRoutes from './routes/productRoutes.js';
+import morgan from 'morgan';
 import orderRoutes from './routes/orderRoutes.js';
 import discountRoutes from './routes/discountRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
@@ -35,7 +36,6 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.resolve(__dirname, 'frontend/public/index.html'))
   );
 } else if (process.env.NODE_ENV === 'development') {
-  import morgan from 'morgan';
   app.get('/', (req, res) => {
     res.send('API is running...');
   });
