@@ -29,50 +29,42 @@ const Image = props => {
           return n.node.relativePath.includes(props.filename)
         })
 
-        if (!image) {
-          try {
-            const src = require(`../../public/images/${props.filename}`)
-            if (src) {
-              const placeholder = data.images.edges.find(n => {
-                return n.node.relativePath.includes("productPlaceholder.jpg")
-              })
-
-              return (
-                <ReactImage
-                  style={{
-                    width: "100%",
-                    display: "flex",
-                    ...props.customStyle,
-                  }}
-                  alt={props.alt}
-                  src={src}
-                  loader={
-                    <div style={{ position: "relative" }}>
-                      <div style={{ visibility: "hidden" }}>
-                        <Img
-                          alt={props.alt}
-                          fluid={placeholder.node.childImageSharp.fluid}
-                          style={props.customStyle}
-                        />
-                      </div>
-                      <Skeleton
-                        variant="rect"
-                        style={{
-                          position: "absolute",
-                          top: 0,
-                          height: "100%",
-                          width: "100%",
-                          zIndex: 111,
-                        }}
-                      />
-                    </div>
-                  }
-                />
-              )
-            }
-          } catch (error) {
-            return null
-          }
+        if (typeof image === "undefined") {
+          const placeholder = data.images.edges.find(n => {
+            return n.node.relativePath.includes("productPlaceholder.jpg")
+          })
+          return (
+            <ReactImage
+              style={{
+                width: "100%",
+                display: "flex",
+                ...props.customStyle,
+              }}
+              alt={props.alt}
+              src={`/images/${props.filename}`}
+              loader={
+                <div style={{ position: "relative" }}>
+                  <div style={{ visibility: "hidden" }}>
+                    <Img
+                      alt={props.alt}
+                      fluid={placeholder.node.childImageSharp.fluid}
+                      style={props.customStyle}
+                    />
+                  </div>
+                  <Skeleton
+                    variant="rect"
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      height: "100%",
+                      width: "100%",
+                      zIndex: 111,
+                    }}
+                  />
+                </div>
+              }
+            />
+          )
         }
         return (
           <Img

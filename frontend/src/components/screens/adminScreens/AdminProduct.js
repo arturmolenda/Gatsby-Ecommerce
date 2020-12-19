@@ -155,9 +155,9 @@ const AdminProduct = ({ id }) => {
     if (!userInfo || !userInfo.isAdmin) navigate("/login")
     if (id && !product && !createSuccess && !updateSuccess) {
       dispatch(getProductDetails(id))
-      dispatch(listProducts())
     } else if (product && id && product._id !== id)
       dispatch(getProductDetails(id))
+    if (products && products.length === 0) dispatch(listProducts())
     // eslint-disable-next-line
   }, [userInfo, id, product])
 
@@ -173,6 +173,11 @@ const AdminProduct = ({ id }) => {
         setFormData([])
       }
     }
+
+    // eslint-disable-next-line
+  }, [createSuccess, updateSuccess])
+
+  useEffect(() => {
     if (uploadSuccess) {
       if (id) {
         dispatch(getProductDetails(id))
@@ -183,7 +188,7 @@ const AdminProduct = ({ id }) => {
       }
     }
     // eslint-disable-next-line
-  }, [createSuccess, updateSuccess, uploadSuccess])
+  }, [uploadSuccess])
 
   useEffect(() => {
     return () => {
