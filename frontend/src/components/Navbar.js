@@ -83,6 +83,8 @@ const Navbar = () => {
   const { userInfo } = useSelector(state => state.userLogin)
   const { cartItems } = useSelector(state => state.cart)
 
+  const browser = typeof window !== "undefined" && window
+
   const logoutHandle = () => {
     dispatch(logout())
     setAnchorEl(null)
@@ -117,72 +119,74 @@ const Navbar = () => {
               searchHandle={searchHandle}
             />
           </div>
-          <div className={classes.menuItems}>
-            <Link className={classes.link} to="/cart">
-              <Button
-                color="inherit"
-                startIcon={
-                  <Badge
-                    color="secondary"
-                    variant="dot"
-                    badgeContent={cartItems.length}
-                  >
-                    <ShoppingCartIcon
-                      style={{ width: ".8em", height: ".8em" }}
-                    />
-                  </Badge>
-                }
-              >
-                CART
-              </Button>
-            </Link>
-            {userInfo ? (
-              <>
-                {userInfo.isAdmin && (
+          {browser && (
+            <div className={classes.menuItems}>
+              <Link className={classes.link} to="/cart">
+                <Button
+                  color="inherit"
+                  startIcon={
+                    <Badge
+                      color="secondary"
+                      variant="dot"
+                      badgeContent={cartItems ? cartItems.length : 0}
+                    >
+                      <ShoppingCartIcon
+                        style={{ width: ".8em", height: ".8em" }}
+                      />
+                    </Badge>
+                  }
+                >
+                  CART
+                </Button>
+              </Link>
+              {userInfo ? (
+                <>
+                  {userInfo.isAdmin && (
+                    <Button
+                      className={classes.link}
+                      color="inherit"
+                      onClick={e => setAdminAnchorEl(e.currentTarget)}
+                      endIcon={<ExpandMoreIcon />}
+                    >
+                      admin
+                    </Button>
+                  )}
                   <Button
                     className={classes.link}
                     color="inherit"
-                    onClick={e => setAdminAnchorEl(e.currentTarget)}
+                    onClick={e => setAnchorEl(e.currentTarget)}
                     endIcon={<ExpandMoreIcon />}
                   >
-                    admin
+                    {userInfo.name.length > 19
+                      ? `${userInfo.name.substring(0, 19)}...`
+                      : userInfo.name}
                   </Button>
-                )}
-                <Button
-                  className={classes.link}
-                  color="inherit"
-                  onClick={e => setAnchorEl(e.currentTarget)}
-                  endIcon={<ExpandMoreIcon />}
-                >
-                  {userInfo.name.length > 19
-                    ? `${userInfo.name.substring(0, 19)}...`
-                    : userInfo.name}
-                </Button>
-                <Popper
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  style={{ zIndex: 1 }}
-                >
-                  <ClickAwayListener onClickAway={() => setAnchorEl(null)}>
-                    <Paper style={{ minWidth: 150, padding: "8px 0" }}>
-                      <Link to="/profile">
-                        <MenuItem onClick={() => setAnchorEl(null)}>
-                          Profile
-                        </MenuItem>
-                      </Link>
-                      <MenuItem onClick={logoutHandle}>Logout</MenuItem>
-                    </Paper>
-                  </ClickAwayListener>
-                </Popper>
-              </>
-            ) : (
-              <>
-                <Link className={classes.link} to="/login">
-                  <Button color="inherit">Login</Button>
-                </Link>
-              </>
-            )}
-          </div>
+                  <Popper
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    style={{ zIndex: 1 }}
+                  >
+                    <ClickAwayListener onClickAway={() => setAnchorEl(null)}>
+                      <Paper style={{ minWidth: 150, padding: "8px 0" }}>
+                        <Link to="/profile">
+                          <MenuItem onClick={() => setAnchorEl(null)}>
+                            Profile
+                          </MenuItem>
+                        </Link>
+                        <MenuItem onClick={logoutHandle}>Logout</MenuItem>
+                      </Paper>
+                    </ClickAwayListener>
+                  </Popper>
+                </>
+              ) : (
+                <>
+                  <Link className={classes.link} to="/login">
+                    <Button color="inherit">Login</Button>
+                  </Link>
+                </>
+              )}
+            </div>
+          )}
         </Toolbar>
       </AppBar>
       <Popper
@@ -214,7 +218,7 @@ const Navbar = () => {
       <DrawerMenu
         open={drawerOpen}
         closeHandle={() => setDrawerOpen(false)}
-        itemsLength={cartItems.length}
+        itemsLength={cartItems ? cartItems.length : 0}
         isLoggedIn={userInfo}
         isAdmin={userInfo && userInfo.isAdmin}
         logoutHandle={logoutHandle}
