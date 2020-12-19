@@ -19,31 +19,35 @@ import Login from "../components/screens/Login"
 import Product from "../components/screens/Product"
 
 export default function Home({ location }) {
+  const browser = typeof window !== "undefined" && window
+
   return (
-    <Container className={"main"}>
-      <Router>
-        <Products path="/" />
-        <Products path="/search/:keyword" />
-        <Products path="/page/:pageNumber" />
-        <Products path="/search/:keyword/page/:pageNumber" />
-        <Product path="/product/:id" />
-        <Login path="/login" location={location} />
-        <Register path="/register" location={location} />
-        <Profile path="/profile" />
-        <Payment path="/payment" />
-        <PlaceOrder path="/placeOrder" />
-        <Shipping path="/shipping" location={location} />
-        <Cart path="/cart" />
-        <Order path="/order/:id" />
-        <AdminProducts path="/admin/products" />
-        <Orders path="/admin/orders" />
-        <Users path="/admin/users" />
-        <Discounts path="/admin/discounts" />
-        <AdminDiscount path="/admin/discounts/new" />
-        <AdminDiscount path="/admin/discounts/edit/:id" />
-        <AdminProduct path="/admin/products/new" />
-        <AdminProduct path="/admin/products/edit/:id" />
-      </Router>
-    </Container>
+    browser && (
+      <Container className={"main"}>
+        <Router>
+          <Products path="/" />
+          <Products path="/search/:keyword" />
+          <Products path="/page/:pageNumber" />
+          <Products path="/search/:keyword/page/:pageNumber" />
+          <Product path="/product/:id" />
+          <Login path="/login" location={location} />
+          <Register path="/register" location={location} />
+          <Profile path="/profile" />
+          <Payment path="/payment" />
+          <PlaceOrder path="/placeOrder" />
+          <Shipping path="/shipping" location={location} />
+          <Cart path="/cart" />
+          <Order path="/order/:id" />
+          <AdminProducts path="/admin/products" />
+          <Orders path="/admin/orders" />
+          <Users path="/admin/users" />
+          <Discounts path="/admin/discounts" />
+          <AdminDiscount path="/admin/discounts/new" />
+          <AdminDiscount path="/admin/discounts/edit/:id" />
+          <AdminProduct path="/admin/products/new" />
+          <AdminProduct path="/admin/products/edit/:id" />
+        </Router>
+      </Container>
+    )
   )
 }

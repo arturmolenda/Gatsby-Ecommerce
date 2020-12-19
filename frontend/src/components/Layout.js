@@ -17,6 +17,7 @@ const useStyles = makeStyles(() => ({
 }))
 
 const Layout = ({ children }) => {
+  const browser = typeof window !== "undefined" && window
   const classes = useStyles()
   return (
     <>
@@ -28,7 +29,7 @@ const Layout = ({ children }) => {
           <Navbar />
           {children}
         </div>
-        <Footer />
+        {browser && <Footer />}
       </div>
     </>
   )
