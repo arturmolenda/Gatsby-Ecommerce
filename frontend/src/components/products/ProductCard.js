@@ -26,8 +26,22 @@ const useStyles = makeStyles(() => ({
     textOverflow: "ellipsis",
   },
 }))
-const ProductCard = ({ product, disableLink, sampleProduct }) => {
+const ProductCard = ({
+  product,
+  disableLink,
+  sampleProduct,
+  keyword,
+  pageNum,
+}) => {
   const classes = useStyles()
+  const backLink = keyword
+    ? pageNum === 1
+      ? `search/${keyword}`
+      : `search/${keyword}/page/${pageNum}`
+    : pageNum === 1
+    ? ""
+    : `page/${pageNum}`
+  console.log(pageNum)
   return (
     <>
       {product && (
@@ -38,7 +52,11 @@ const ProductCard = ({ product, disableLink, sampleProduct }) => {
           }}
         >
           <div style={{ pointerEvents: disableLink && "none" }}>
-            <Link to={`/product/${product._id}`}>
+            <Link
+              to={`/product/${product._id}${
+                backLink && `?backLink=${backLink}`
+              }`}
+            >
               <div className={classes.imgContainer}>
                 {disableLink && product.images[0].image && !sampleProduct ? (
                   product.images[0].local ? (

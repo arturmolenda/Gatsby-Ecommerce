@@ -29,7 +29,7 @@ const Products = props => {
   } = useSelector(state => state.productTopRated)
 
   const keyword = props.keyword
-  const page = props.pageNumber
+  const page = typeof props.pageNumber === "undefined" ? 1 : props.pageNumber
 
   useEffect(() => {
     dispatch(listTopRatedProducts(4))
@@ -57,19 +57,17 @@ const Products = props => {
           </Link>
         )}
 
-        {topLoading ? (
-          <Loader contained />
-        ) : (
-          !topError &&
-          !keyword &&
-          !page && (
-            <Grid container spacing={3}>
-              <Grid item sm={12} xs={12}>
-                <Carousel products={topProducts} />
+        {topLoading
+          ? !topError && !keyword && !page && <Loader contained />
+          : !topError &&
+            !keyword &&
+            !page && (
+              <Grid container spacing={3}>
+                <Grid item sm={12} xs={12}>
+                  <Carousel products={topProducts} />
+                </Grid>
               </Grid>
-            </Grid>
-          )
-        )}
+            )}
         <Typography variant="h1">
           {keyword ? "SHOWING SEARCH RESULTS" : "LATEST PRODUCTS"}
         </Typography>
@@ -89,7 +87,12 @@ const Products = props => {
               {products.length !== 0 &&
                 products.map(product => (
                   <Grid item xs={6} sm={4} md={3} key={product._id}>
-                    <ProductCard key={product._id} product={product} />
+                    <ProductCard
+                      key={product._id}
+                      product={product}
+                      keyword={keyword}
+                      pageNum={page}
+                    />
                   </Grid>
                 ))}
             </Grid>
