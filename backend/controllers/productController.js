@@ -287,7 +287,27 @@ const createProductReview = asyncHandler(async (req, res) => {
 // @route  POST /api/products/reset
 // @access Private
 const resetProducts = asyncHandler(async (req, res) => {
+  const storeProducts = await Product.find();
   try {
+    storeProducts.map((item) => {
+      const __dirname = path.resolve();
+      if (item.images.length !== 0) {
+        item.images.map((img) => {
+          if (!mainImages.includes(img.image)) {
+            fs.unlink(
+              path.join(__dirname, `/frontend/public/images/${img.image}`),
+              (err) => {
+                if (err) {
+                  console.error(err);
+                  res.json(500);
+                  throw new Error('Reseting products failed');
+                }
+              }
+            );
+          }
+        });
+      }
+    });
     await Product.deleteMany();
 
     const sampleProducts = products.map((product) => {
