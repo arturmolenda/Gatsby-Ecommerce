@@ -2,7 +2,7 @@
 ![GatsbyStore](https://user-images.githubusercontent.com/60189847/111696032-12cc7c00-8834-11eb-8c70-575836dd9050.jpg)
 Ecommerce store with custom cms. Built using [Gatsby JS](https://www.gatsbyjs.com/) for frontend and [Node JS](https://nodejs.org/) with [Express](https://expressjs.com/) for backend and [MongoDB](http://mongodb.com/) for database.
 
-## [live demo](https://gatsby-store.herokuapp.com/)
+## [live demo](https://gatsby-ecommerce.up.railway.app/)
 
 To try administrator features please use this account 
 
